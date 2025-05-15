@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Synchro\Violation\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class ViolationCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-violations';
 
     public $description = 'My command';
 
