@@ -7,7 +7,7 @@
 
 The Content-Security-Policy (CSP) and Network Error Logging (NEL) HTTP headers provide ways to tell clients to report policy violations to a specified URL.
 
-While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service because it reveals the client's IP and user-agent string to the third-party site, since reports are sent directly from the client's browser to the reporting service. Such leakage is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason.
+While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service. It reveals the fact that they are visiting your site, their IP, and their user-agent string to the third-party site, since reports are sent directly from the client's browser to the reporting service. Such leakage is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason.
 
 Another reason to do this is if the site you are deploying is on a private network that has no external internet access, so you need to store the reports locally, or forward them via a proxy service, or you won't see the reports at all.
 
@@ -19,19 +19,6 @@ It does however preserve user-agent strings, letting you spot issues relating to
 While this package receives and understands reports, it doesn't do anything with them beyond store and forward them – that's up to you. Each report type has a DTO class that you can use to parse the report content, and you can listen for the events that are fired when reports are received, so it's easy for you to hook into these events and take further action.
 
 [Examples of some unusual but interesting CSP reports](https://github.com/nico3333fr/CSP-useful/blob/master/csp-wtf/explained.md).
-
-## Creating your CSP header
-
-This package does not generate your `Content-Security-Policy` header, but you can generate one either manually or by using the [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp) package, which provides a fluent interface for building a CSP header. Using Spatie's package, you should set the `report-to` directive to point at the reporting endpoint you define in your application by setting the `report-to` option in the `config/csp.php` config file, for example:
-
-```php
-'report_uri' => url('csp-report'),
-```
-
-## Support us
-
-This package was written by Marcus Bointon, [@Synchro on GitHub](https://github.com/Synchro), and is released under the MIT open-source license. If you rely on it, please consider becoming [a GitHub Sponsor](https://github.com/sponsors/Synchro).
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-violations.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-violations)
 
 ## Installation
 
@@ -63,76 +50,87 @@ There are two ways of defining target URLs to send reports to in CSP.
 The preferred mechanism is [the `report-to` directive from CSP level 3](https://w3c.github.io/webappsec-csp/#directive-report-to) which targets
 a [named reporting endpoint](https://www.w3.org/TR/reporting-1/) from a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to, like this:
 
-```http request
-Reporting-Endpoints: csp-report="https://example.com/csp-report", nel-report="https://example.com/nel-report"
-Content-Security-Policy: default-src 'self'; report-to csp-report
+```http header
+Reporting-Endpoints: csp-report="https://example.com/csp", nel-report="https://example.com/nel"
+Content-Security-Policy: default-src 'self'; report-to csp
 ```
 
 The second mechanism is [the deprecated `report-uri` directive defined in CSP level 2](https://www.w3.org/TR/CSP2/#directive-report-uri), which includes the
 reporting URL directly inside the CSP:
 
-```http request
-Content-Security-Policy: default-src 'self'; report-uri https://example.com/report-uri
+```http header
+Content-Security-Policy: default-src 'self'; report-uri https://example.com/csp
 ```
 
-One other difference is that `report-uri` can contain multiple URLs, whereas `report-to` can only contain a single target name.
+One other difference is that `report-uri` can contain multiple URLs, whereas `report-to` can only contain a single target name. For compatibility with both at once, this package only supports creating a single reporting URL per named endpoint.
 
-It's safe to define both directives; browsers that support `report-to` will prioritise it over `report-uri`, as per [the CSP level 3 spec](https://w3c.github.io/webappsec-csp/#directive-report-uri).
+It's safe to define both directives; browsers that support `report-to` will ignore `report-uri` if it's also present, as per [the CSP level 3 spec](https://w3c.github.io/webappsec-csp/#directive-report-uri), and browsers that don't support `report-to` won't know what they're missing. The world is currently in a transition period where `report-uri` is deprecated, but support for `report-to` remains thin, so it's best to support both for now. Keep an eye on [caniuse.com](https://caniuse.com/mdn-http_headers_content-security-policy_report-to) for browser support updates.
 
-Note that this class does not support [the deprecated `Report-To` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Report-To), though be sure not to confuse that with the `report-to` CSP directive; they are different things.
+If you configure the included `\Synchro\Violation\Http\Middleware\AddReportingHeaders` middleware, it will automatically add the `Reporting-Endpoints` and `Report-To` headers to your responses, so you don't need to do that yourself.
 
-### Using Spatie's CSP package
-[Spatie's CSP package](https://github.com/spatie/laravel-csp) helps you build complex CSP headers using a nice fluent interface. While it supports the `report-uri` and `report-to` directives, it doesn't actually create their values. That's where this package comes in.
+## Creating reporting headers
 
-For `report-to` (where the param is the name of your defined endpoint for CSP reports), set it like this:
-```php
-->addDirective(Directive::REPORT_TO, 'csp-report')
-```
-and for the old `report-uri` (where the parameter given to `url()` is the name of your CSP reporting route), like this:
+This package provides a middleware that will add both the `Reporting-Endpoints` and deprecated `Report-To` headers to your responses, either of which are required for the `report-to` directive to work in either CSP or NEL. You can add this middleware to your global middleware stack in `app/Http/Kernel.php`:
 
 ```php
-->addDirective(Directive::REPORT, url('csp-report'))
+\Synchro\Violation\Http\Middleware\AddReportingHeaders::class
+```
+You can also add it to specific routes or route groups if you only want it to apply to certain parts of your application.
+
+## Creating your CSP header
+This package does not generate your `Content-Security-Policy` header for you, but you can either create one manually or by using the [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp) package.
+
+### Building your own CSP
+You can set a CSP header manually on responses, and use this package to generate the correct value for the directives you need. For example, to set the `report-to` directive, you can do something like this in your controller or middleware:
+
+```php
+return response($content)
+    ->header('Content-Security-Policy', 'default-src \'self\'; report-to '.Synchro\Violation\Violation::cspReportTo());
 ```
 
-### Network Error Logging (NEL)
+### Using `spatie/laravel-csp`
+
+[Spatie's CSP package for Laravel](https://github.com/spatie/laravel-csp) helps you build complex CSP headers using a nice fluent interface. While it supports the `report-uri` and `report-to` directives, it doesn't actually create their values; That's where this package comes in.
+In Spatie's CSP config fie in `config/csp.php`, set the `report-to` and `report-uri` CSP directives to retrieve correctly formatted reporting endpoints that you defined in this package's config, using the helper functions, for example:
+
+```php
+'report-uri' => \Synchro\Violation\Violation::cspReportUri(),
+'report-to' => \Synchro\Violation\Violation::cspReportTo(),
+```
+
+There is also a `Spatie\Csp\Preset` class ready to use in `\Synchro\Violation\Support\AddReportingEndpointsPreset` which you can add to your CSP config to have it define the reporting directives for you.
+
+## Network Error Logging (NEL)
+
 This class also supports handling [Network Error Logging](https://www.w3.org/TR/network-error-logging/) reports,
-which are sent when a client-side network error occurs, such as a failed connection to a server or a DNS lookup failure.
-You can set up an `NEL` header in your application that points at the reporting route in your application, like this:
+which are sent when a client-side network error occurs, such as a failed connection to a CDN server or a DNS lookup failure.
+You can set up an `NEL` header in your application that points at a named reporting endpoint defined in `Reporting-Endpoints` header, like this:
 
-```http request
-NEL: {"report-to": "nel-reports"}
+```
+NEL: {"report-to": "nel"}
 ```
 
-Note that since the point of NEL is to report connectivity issues with your application from the client's perspective,
-pointing it the same application it's having trouble connecting to is unlikely to be useful! Ideally the NEL reporting
-endpoint should be handled by a different app running on separate hosting.
+Just like CSP, creating this header is left up to you, but note that the `report-to` target URLs *are* managed by this package, so use the same names.
 
-## Events
-This package generates events when it receives a report. You can listen for these events in your application to take further action by creating a listener for the `\Synchro\Violations\Events\Violation` event.
+## Receiving reports
+The package provides routes that you can use to receive reports. By default, is configured to receive both CSP and NEL reports at `/csp` and `/nel` respectively, but you can change them in the config file.
 
-## Nova support
-This package optionally includes a [Laravel Nova](https://nova.laravel.com) resource for viewing and managing reports. To use it, you must have Nova installed in your application. Install it with artisan:
+### Saving to the database
+When a report is received, it is parsed and stored in the database if you have set a table name in the config file (and run the associated migration, described above). There is a Violation model defined in `\Synchro\Violation\Models\Violation` that you can use to query the reports stored in the database. The `report` field of this model contains the complete, unaltered report received from the client, and you can parse it using the [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) DTO classes provided by this package (see below).
 
-```bash
-php artisan vendor:publish --tag="laravel-violations-nova"
-```
-You'll then need to add it to your Nova resource list by adding it to your `NovaServiceProvider`:
+### Sending an event
+On receiving a report, the package fires an event called `\Synchro\Violation\Events\Violation`, which you can listen for in your application to take further action, such as logging or alerting.
 
-```php
-use Synchro\Violations\Nova\Violation;
-//...
-```
+### Forwarding reports
+You can also optionally forward the report to an external service such as [report-uri.com](https://report-uri.com) and this is done by dispatching a job called `\Synchro\Violation\Jobs\ForwardReport` that will send the report to the configured endpoint.
 
-## Filament support
+Even if you do not configure saving reports to the database, the package will still parse the reports and fire the event, so you can still take action on them without storing them locally.
 
-This package optionally includes a [Filament](https://filamentphp.com) resource for viewing and managing reports.
-To use it, you must have Filament installed in your application. Install it with artisan:
-
-```bash
-php artisan vendor:publish --tag="laravel-violations-filament"
-```
+### Parsing reports
+While it's not the primary focus of this package, [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) DTO classes are provided for each type of report that it can handle, complete with attribute-based validation, which you can use to parse the report content. For example, you can use `\Synchro\Violation\Reports\CSPReportData` to parse a CSP report (the interesting data will be in the wrapped `CSPReport`), and `\Synchro\Violation\Reports\NELReport` for an NEL report.
 
 ## Testing
+
 Tests are written using [pest](https://pestphp.com). You can run them with:
 ```bash
 composer test
@@ -150,10 +148,11 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 Please review [our security policy](SECURITY.md) on how to report security vulnerabilities.
 
-## Credits
+## Support open source development
+
+This package was written by Marcus Bointon, [@Synchro on GitHub](https://github.com/Synchro), and is released under the MIT open-source license. If you rely on it, please consider becoming [a GitHub Sponsor](https://github.com/sponsors/Synchro).
 
 - [Marcus Bointon](https://github.com/Synchro)
-- [All Contributors](../../contributors)
 
 ## License
 
