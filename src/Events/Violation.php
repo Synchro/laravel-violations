@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -9,7 +11,9 @@ use Synchro\Violation\Models\Violation as ViolationModel;
 
 class Violation
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public ViolationModel $violation,

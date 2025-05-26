@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Reports;
 
-use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Data;
+use Synchro\Violation\Enums\NELReportType;
 
 /**
  * Class representing a Network Error Logging report sent to a report-to URL in a CSP.
@@ -23,7 +26,7 @@ class NELReport extends Data
         // The target destination
         readonly public string $destination = '',
         // What kind of error report this is
-        readonly public string $type = '',
+        readonly public NELReportType $type = NELReportType::NETWORK_ERROR,
         // The number of milliseconds between report generation and the time the error occurred
         #[Min(0)]
         readonly public int $age = 0,
@@ -34,23 +37,7 @@ class NELReport extends Data
         #[Min(0)]
         readonly public int $attempts = 0,
         // The address of the document where the violation occurred.
+        #[Max(2048)]
         readonly public string $url = '',
     ) {}
-
-    /**
-     * @return array<string,string|array<string|Rule>>
-     */
-    public static function rules(): array
-    {
-        return [
-            'body' => ['required', 'array'],
-            'user_agent' => ['required', 'string'],
-            'destination' => ['required', 'string'],
-            'type' => ['required', 'string', 'in:network-error,disconnected'],
-            'age' => ['integer', 'min:0'],
-            'timestamp' => ['integer', 'min:0'],
-            'attempts' => ['integer', 'min:0'],
-            'url' => ['string', 'max:2048'],
-        ];
-    }
 }

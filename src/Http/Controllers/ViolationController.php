@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Http\Controllers;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -37,8 +39,8 @@ class ViolationController extends Controller
             throw new BadRequestHttpException('Invalid Content-Type; must be \'application/csp-report\'');
         }
         try {
-            $jsonData = json_decode($request->getContent(), true.JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
+            $jsonData = json_decode($request->getContent(), true, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
             throw new BadRequestHttpException('Invalid JSON data: '.$e->getMessage());
         }
         // Manually create the DTO from the decoded JSON data
@@ -84,12 +86,17 @@ class ViolationController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Some browsers may send an OPTIONS request before sending a CSP report in a POST request,
+     * so let the browser know that it's OK.
+     */
     public function options(Request $request): Response
     {
-        // Allow any origin and allow the POST method
+        // Allow any origin and allow the OPTIONS method
+        // Note that GET, POST, and HEAD are always allowed
         $headers = [
             'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Methods' => 'POST',
+            'Access-Control-Allow-Methods' => 'OPTIONS',
         ];
 
         // If the request includes an Access-Control-Request-Headers header,
@@ -98,7 +105,7 @@ class ViolationController extends Controller
             if (! $this->validateAccessControlRequestHeaders($request->header('Access-Control-Request-Headers'))) {
                 return response('Invalid headers requested', 400);
             }
-            // If we get here, all the requested headers are in the allow list, so just copy the whole thing back to the response
+            // If we get here, all the requested headers are in the allowlist, so just copy the whole thing back to the response
             $headers['Access-Control-Allow-Headers'] = $request->header('Access-Control-Request-Headers');
         }
 

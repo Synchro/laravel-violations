@@ -7,12 +7,12 @@ use Synchro\Violation\Violation;
 it('adds the CSP report-uri and report-to clauses to the policy directly', function () {
     $policy = new Policy;
 
-    $policy->add(\Spatie\Csp\Directive::REPORT, Violation::getCspReportUri());
-    $policy->add(\Spatie\Csp\Directive::REPORT_TO, Violation::getCspReportTo());
+    $policy->add(\Spatie\Csp\Directive::REPORT, Violation::cspReportUri());
+    $policy->add(\Spatie\Csp\Directive::REPORT_TO, Violation::cspReportTo());
     expect($policy->getContents())
         ->toBeString()
-        ->toContain('report-uri '.Violation::getCspReportUri())
-        ->toContain('report-to '.Violation::getCspReportTo());
+        ->toContain('report-uri '.Violation::cspReportUri())
+        ->toContain('report-to '.Violation::cspReportTo());
 });
 
 it('adds the CSP report-uri and report-to to the policy using a preset', function () {
@@ -22,6 +22,6 @@ it('adds the CSP report-uri and report-to to the policy using a preset', functio
 
     expect($policy->getContents())
         ->toBeString()
-        ->toContain('report-uri '.Violation::getCspReportUri())
-        ->toContain('report-to '.Violation::getCspReportTo());
+        ->toContain('report-uri '.Violation::cspReportUri())
+        ->toContain('report-to '.Violation::cspReportTo());
 });

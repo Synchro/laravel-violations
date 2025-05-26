@@ -21,13 +21,13 @@ return [
     'endpoints' => [
         [
             'name' => 'csp',
-            'url' => url('violation/csp'),
+            'url' => url('csp'),
             'max_age' => 86400, // 1 day
             'type' => 'csp',
         ],
         [
             'name' => 'nel',
-            'url' => url('violation/nel'),
+            'url' => url('nel'),
             'max_age' => 86400, // 1 day
             'type' => 'nel',
         ],

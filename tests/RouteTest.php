@@ -3,7 +3,26 @@
 use Illuminate\Support\Facades\Route;
 use Synchro\Violation\Http\Controllers\ViolationController;
 
-// Adjust namespace if necessary
+it('can serve and OPTIONS request', function () {
+    // Mock the request to simulate an OPTIONS request
+    $this->withoutExceptionHandling(); // Optional: To see any exceptions thrown
+
+    // Ensure the middleware is applied
+    // $this->withMiddleware(\Synchro\Violation\Http\Middleware\AddReportingEndpointsHeader::class);
+
+    // Register a route for OPTIONS requests
+    Route::options('/csp/options', [ViolationController::class, 'options']);
+
+    // Make an OPTIONS request to this route
+    $response = $this->call('OPTIONS', '/csp/options');
+
+    expect($response->status())
+        ->toBe(204)
+        ->and($response->headers->get('Access-Control-Allow-Methods'))
+        ->toBe('OPTIONS')
+        ->and($response->headers->get('Access-Control-Allow-Origin'))
+        ->toBe('*');
+});
 
 it('can receive a CSP report-uri report', function () {
     // Mock the request to simulate a CSP violation report

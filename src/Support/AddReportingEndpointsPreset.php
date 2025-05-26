@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Support;
 
 use Spatie\Csp\Policy;
@@ -10,7 +12,7 @@ class AddReportingEndpointsPreset implements Preset
 {
     public function configure(Policy $policy): void
     {
-        $policy->add(\Spatie\Csp\Directive::REPORT, Violation::getCspReportUri());
-        $policy->add(\Spatie\Csp\Directive::REPORT_TO, Violation::getCspReportTo());
+        $policy->add(\Spatie\Csp\Directive::REPORT, Violation::cspReportUri());
+        $policy->add(\Spatie\Csp\Directive::REPORT_TO, Violation::cspReportTo());
     }
 }

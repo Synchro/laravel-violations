@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;

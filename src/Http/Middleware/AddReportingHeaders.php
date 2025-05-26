@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Http\Middleware;
 
 use Closure;
@@ -24,8 +26,8 @@ class AddReportingHeaders
         $response = $next($request);
 
         if (count(config('violations.endpoints')) > 0) {
-            $response->header('Reporting-Endpoints', Violation::getReportingEndpointsHeaderValue());
-            $response->header('Report-To', Violation::getReportToHeaderValue());
+            $response->header('Reporting-Endpoints', Violation::reportingEndpointsHeaderValue());
+            $response->header('Report-To', Violation::reportToHeaderValue());
         }
 
         return $response;
