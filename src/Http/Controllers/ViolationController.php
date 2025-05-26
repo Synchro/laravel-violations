@@ -40,7 +40,7 @@ class ViolationController extends Controller
         }
         try {
             $jsonData = json_decode($request->getContent(), true, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             throw new BadRequestHttpException('Invalid JSON data: '.$e->getMessage());
         }
         // Manually create the DTO from the decoded JSON data
