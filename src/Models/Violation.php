@@ -2,6 +2,7 @@
 
 namespace Synchro\Violation\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,9 @@ class Violation extends Model
 
     public $guarded = [];
 
+    /**
+     * @var list<string>
+     */
     protected $fillable = [
         'report',
         'report_type',
@@ -33,6 +37,9 @@ class Violation extends Model
         'updated_at',
     ];
 
+    /**
+     * @var array<string,string>
+     */
     protected $casts = [
         'report' => 'json',
         'report_type' => ReportType::class,
@@ -40,10 +47,11 @@ class Violation extends Model
 
     protected function table(): string
     {
-        return config('violations.table_name');
+        return config('violations.table');
     }
 
-    public function scopeUnforwarded(Builder $query): void
+    #[Scope]
+    public function unforwarded(Builder $query): void
     {
         $query->where('forwarded', false);
     }

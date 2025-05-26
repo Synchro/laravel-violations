@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Synchro\Violation\Enums\ReportType;
 use Synchro\Violation\Models\Violation;
 
+/**
+ * @extends Factory<Violation>
+ */
 class ViolationFactory extends Factory
 {
     protected $model = Violation::class;

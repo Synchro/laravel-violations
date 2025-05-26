@@ -7,23 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create(config('violations.table_name'), static function (Blueprint $table) {
+        Schema::create(config('violations.table'), static function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $connection = DB::connection();
-            $driver     = $connection->getDriverName();
-
-            if ($driver === 'mysql') {
-                $table
-                    ->string('report_type', 16)
-                    ->charset('ascii')
-                    ->collation('ascii_bin');
-            } elseif ($driver === 'sqlite') {
-                //Laravel doesn't map this collation correctly, so we need to do it manually
-                $table
-                    ->string('report_type', 16)
-                    ->collation('BINARY');
-            }
+            $table->string('report_type', 16);
             //User agent strings can contain random binary data, so need to use a blob, not text
             $table
                 ->binary('user_agent')
@@ -44,6 +31,6 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists(config('violations.table_name'));
+        Schema::dropIfExists(config('violations.table'));
     }
 };

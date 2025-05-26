@@ -11,19 +11,25 @@ return [
      */
     'sanitize' => (bool) env('VIOLATIONS_SANITIZE', true),
     /**
-     * Whether to store reports in the database (you may want to forward only)
+     * The name of the table to store reports in, if null, nothing is stored
      */
-    'use_database' => (bool) env('VIOLATIONS_USE_DATABASE', false),
+    'table' => env('VIOLATIONS_TABLE', null),
     /**
-     * The name of the table to store reports in
-     */
-    'table_name' => env('VIOLATIONS_DATABASE_TABLE', 'violations'),
-    /**
-     * The named endpoints to include in the `Reporting-Endpoints` header
+     * The named endpoints to use in CSP, Reporting-Endpoints and Report-To headers
      * Each needs a name and a URL, which may or may not be an endpoint in the host app
      */
     'endpoints' => [
-        'csp-report' => url('violation/csp'),
-        'nel-report' => url('violation/nel'),
+        [
+            'name' => 'csp',
+            'url' => url('violation/csp'),
+            'max_age' => 86400, // 1 day
+            'type' => 'csp',
+        ],
+        [
+            'name' => 'nel',
+            'url' => url('violation/nel'),
+            'max_age' => 86400, // 1 day
+            'type' => 'nel',
+        ],
     ],
 ];

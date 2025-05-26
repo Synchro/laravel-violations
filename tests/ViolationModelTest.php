@@ -1,14 +1,19 @@
 <?php
 
+use Synchro\Violation\Database\Factories\ViolationFactory;
 use Synchro\Violation\Models\Violation;
 
-it('can create a model', function () {
-    config()->set('violations.use_database', true);
-    $model = Violation::factory()->create();
+it('can create a violation model', function () {
+    $violationData = ViolationFactory::new()->definition();
+    $model = Violation::factory()->create($violationData);
     $this->assertModelExists($model);
     expect($model)
         ->toBeInstanceOf(Violation::class)
         ->and($model->id)->toBeGreaterThan(0)
+        ->and($model->report)->toBe($violationData['report'])
+        ->and($model->user_agent)->toBe($violationData['user_agent'])
+        ->and($model->ip)->toBe($violationData['ip'])
+        ->and($model->report_type)->toBe($violationData['report_type'])
         ->and($model->created_at)->not()->toBeNull()
         ->and($model->updated_at)->not()->toBeNull();
 });
