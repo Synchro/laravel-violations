@@ -66,14 +66,15 @@ One other difference is that `report-uri` can contain multiple URLs, whereas `re
 
 It's safe to define both directives; browsers that support `report-to` will ignore `report-uri` if it's also present, as per [the CSP level 3 spec](https://w3c.github.io/webappsec-csp/#directive-report-uri), and browsers that don't support `report-to` won't know what they're missing. The world is currently in a transition period where `report-uri` is deprecated, but support for `report-to` remains thin, so it's best to support both for now. Keep an eye on [caniuse.com](https://caniuse.com/mdn-http_headers_content-security-policy_report-to) for browser support updates.
 
-If you configure the included `\Synchro\Violation\Http\Middleware\AddReportingHeaders` middleware, it will automatically add the `Reporting-Endpoints` and `Report-To` headers to your responses, so you don't need to do that yourself.
-
 ## Creating reporting headers
-
-This package provides a middleware that will add both the `Reporting-Endpoints` and deprecated `Report-To` headers to your responses, either of which are required for the `report-to` directive to work in either CSP or NEL. You can add this middleware to your global middleware stack in `app/Http/Kernel.php`:
+This package provides a middleware that will add both the `Reporting-Endpoints` and deprecated `Report-To` headers to your responses, either of which are required for the `report-to` directive to work in either CSP or NEL. You can add this as global middleware (so it will be added to all responses) in `bootstrap/app.php`:
 
 ```php
 \Synchro\Violation\Http\Middleware\AddReportingHeaders::class
+->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(AddCspHeaders::class);
+        $middleware->append(AddReportingHeaders::class);
+    })
 ```
 You can also add it to specific routes or route groups if you only want it to apply to certain parts of your application.
 
@@ -89,7 +90,6 @@ return response($content)
 ```
 
 ### Using `spatie/laravel-csp`
-
 [Spatie's CSP package for Laravel](https://github.com/spatie/laravel-csp) helps you build complex CSP headers using a nice fluent interface. While it supports the `report-uri` and `report-to` directives, it doesn't actually create their values; That's where this package comes in.
 In Spatie's CSP config fie in `config/csp.php`, set the `report-to` and `report-uri` CSP directives to retrieve correctly formatted reporting endpoints that you defined in this package's config, using the helper functions, for example:
 
@@ -101,7 +101,6 @@ In Spatie's CSP config fie in `config/csp.php`, set the `report-to` and `report-
 There is also a `Spatie\Csp\Preset` class ready to use in `\Synchro\Violation\Support\AddReportingEndpointsPreset` which you can add to your CSP config to have it define the reporting directives for you.
 
 ## Network Error Logging (NEL)
-
 This class also supports handling [Network Error Logging](https://www.w3.org/TR/network-error-logging/) reports,
 which are sent when a client-side network error occurs, such as a failed connection to a CDN server or a DNS lookup failure.
 You can set up an `NEL` header in your application that points at a named reporting endpoint defined in `Reporting-Endpoints` header, like this:

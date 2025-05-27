@@ -17,17 +17,20 @@ return [
     /**
      * The named endpoints to use in CSP, Reporting-Endpoints and Report-To headers
      * Each needs a name and a URL, which may or may not be an endpoint in the host app
+     * The max-age value is only used in the Report-To header; it is not used in Reporting-Endpoints.
+     * The type value is used to determine which URLs to use in the CSP or NEL header; typically, you will only need one of each.
+     * If you change the URL prefix passed to the route macro in the service provider, you will need to update the route names here to match.
      */
     'endpoints' => [
         [
             'name' => 'csp',
-            'url' => url('csp'),
+            'url' => fn () => route('violations.csp'),
             'max_age' => 86400, // 1 day
             'type' => 'csp',
         ],
         [
             'name' => 'nel',
-            'url' => url('nel'),
+            'url' => fn () => route('violations.nel'),
             'max_age' => 86400, // 1 day
             'type' => 'nel',
         ],

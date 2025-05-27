@@ -39,14 +39,18 @@ class ViolationController extends Controller
             throw new BadRequestHttpException('Invalid Content-Type; must be \'application/csp-report\'');
         }
         try {
-            $jsonData = json_decode($request->getContent(), true, JSON_THROW_ON_ERROR);
+            $jsonData = json_decode(
+                json: $request->getContent(),
+                associative: true,
+                flags: JSON_THROW_ON_ERROR
+            );
         } catch (JsonException $e) {
-            throw new BadRequestHttpException('Invalid JSON data: '.$e->getMessage());
+            abort(Response::HTTP_BAD_REQUEST, 'Invalid JSON data');
         }
         // Manually create the DTO from the decoded JSON data
         $report = CSPReportData::from($request->getContent());
         // Make a violation model instance
-        $violation = Violation::make([
+        $violation = new Violation([
             'report' => $report->toJson(),
             'report_type' => ReportType::REPORT_URI,
             'user_agent' => (config('violations.sanitize') ? null : $request->header('User-Agent')),
@@ -87,7 +91,7 @@ class ViolationController extends Controller
     }
 
     /**
-     * Some browsers may send an OPTIONS request before sending a CSP report in a POST request,
+     * Browsers may send an OPTIONS request before sending a report in a POST request,
      * so let the browser know that it's OK.
      */
     public function options(Request $request): Response

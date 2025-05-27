@@ -14,7 +14,7 @@ class Violation
     {
         return collect(config('violations.endpoints'))
             ->where('type', 'csp')
-            ->pluck('url')
+            ->map(fn ($endpoint) => is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'])
             ->implode(' ');
     }
 
@@ -39,7 +39,9 @@ class Violation
         return collect(config('violations.endpoints'))
             // Extract just the name and url from the endpoint list, format them as name=url
             ->map(function ($endpoint) {
-                return $endpoint['name'].'='.$endpoint['url'];
+                $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
+
+                return $endpoint['name'].'='.$url;
             })
             ->implode(' ');
     }
@@ -52,10 +54,12 @@ class Violation
     {
         return collect(config('violations.endpoints'))
             ->map(function ($endpoint) {
+                $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
+
                 return [
                     'group' => $endpoint['name'],
                     'max_age' => $endpoint['max_age'],
-                    'endpoints' => [['url' => $endpoint['url']]],
+                    'endpoints' => [['url' => $url]],
                 ];
             })
             ->toJson();
