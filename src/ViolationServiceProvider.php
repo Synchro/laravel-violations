@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Synchro\Violation;
 
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -29,16 +30,18 @@ class ViolationServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         Route::macro('violations', function (string $baseUrl = 'violations') {
-            Route::prefix($baseUrl)->group(function () use ($baseUrl) {
-                Route::options('csp', [ViolationController::class, 'options'])
-                    ->name($baseUrl.'.csp.options');
-                Route::options('nel', [ViolationController::class, 'options'])
-                    ->name($baseUrl.'.nel.options');
-                Route::post('csp', [ViolationController::class, 'csp'])
-                    ->name($baseUrl.'.csp');
-                Route::post('nel', [ViolationController::class, 'nel'])
-                    ->name($baseUrl.'.nel');
-            });
+            Route::prefix($baseUrl)
+                 ->withoutMiddleware(ValidateCsrfToken::class)
+                 ->group(function () use ($baseUrl) {
+                     Route::options('csp', [ViolationController::class, 'options'])
+                          ->name($baseUrl.'.csp.options');
+                     Route::options('nel', [ViolationController::class, 'options'])
+                          ->name($baseUrl.'.nel.options');
+                     Route::post('csp', [ViolationController::class, 'csp'])
+                          ->name($baseUrl.'.csp');
+                     Route::post('nel', [ViolationController::class, 'nel'])
+                          ->name($baseUrl.'.nel');
+                 });
         });
     }
 }
