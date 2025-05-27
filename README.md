@@ -34,7 +34,7 @@ Publish the config file with:
 php artisan vendor:publish --tag="violations-config"
 ```
 
-Database support is optional; you may not want to keep the reports locally if you're forwarding them to an external report aggregation service. If you do want database support, set a table name in the config, then publish and run the migrations:
+Database support is optional; you may not want to keep the reports locally if you're forwarding them to an external report aggregation service. If you do want database support, set a table name in the config first, *then* publish and run the migration (or the migration will be ignored):
 
 ```bash
 php artisan vendor:publish --tag="violations-migrations"
@@ -47,22 +47,20 @@ It's worth reading [the docs on CSP violation reporting](https://developer.mozil
 
 There are two ways of defining target URLs to send reports to in CSP.
 
-The preferred mechanism is [the `report-to` directive from CSP level 3](https://w3c.github.io/webappsec-csp/#directive-report-to) which targets
-a [named reporting endpoint](https://www.w3.org/TR/reporting-1/) from a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to, like this:
+The preferred mechanism is [the `report-to` directive from CSP level 3](https://w3c.github.io/webappsec-csp/#directive-report-to) which targets a [named reporting endpoint](https://www.w3.org/TR/reporting-1/) from a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to, like this:
 
 ```http header
 Reporting-Endpoints: csp-report="https://example.com/csp", nel-report="https://example.com/nel"
 Content-Security-Policy: default-src 'self'; report-to csp
 ```
 
-The second mechanism is [the deprecated `report-uri` directive defined in CSP level 2](https://www.w3.org/TR/CSP2/#directive-report-uri), which includes the
-reporting URL directly inside the CSP:
+The second mechanism is [the deprecated `report-uri` directive defined in CSP level 2](https://www.w3.org/TR/CSP2/#directive-report-uri), which includes the reporting URL directly inside the CSP:
 
 ```http header
 Content-Security-Policy: default-src 'self'; report-uri https://example.com/csp
 ```
 
-One other difference is that `report-uri` can contain multiple URLs, whereas `report-to` can only contain a single target name. For compatibility with both at once, this package only supports creating a single reporting URL per named endpoint.
+One other difference is that `report-uri` can contain multiple URLs, whereas `report-to` can only contain a single target name. For compatibility with both at once, *this package only supports creating a single reporting URL per named endpoint*.
 
 It's safe to define both directives; browsers that support `report-to` will ignore `report-uri` if it's also present, as per [the CSP level 3 spec](https://w3c.github.io/webappsec-csp/#directive-report-uri), and browsers that don't support `report-to` won't know what they're missing. The world is currently in a transition period where `report-uri` is deprecated, but support for `report-to` remains thin, so it's best to support both for now. Keep an eye on [caniuse.com](https://caniuse.com/mdn-http_headers_content-security-policy_report-to) for browser support updates.
 
@@ -70,16 +68,17 @@ It's safe to define both directives; browsers that support `report-to` will igno
 This package provides a middleware that will add both the `Reporting-Endpoints` and deprecated `Report-To` headers to your responses, either of which are required for the `report-to` directive to work in either CSP or NEL. You can add this as global middleware (so it will be added to all responses) in `bootstrap/app.php`:
 
 ```php
-\Synchro\Violation\Http\Middleware\AddReportingHeaders::class
+use \Synchro\Violation\Http\Middleware\AddReportingHeaders;
+//...
 ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(AddCspHeaders::class);
+        $middleware->append(AddCspHeaders::class); //From Spatie's CSP package
         $middleware->append(AddReportingHeaders::class);
     })
 ```
 You can also add it to specific routes or route groups if you only want it to apply to certain parts of your application.
 
 ## Creating your CSP header
-This package does not generate your `Content-Security-Policy` header for you, but you can either create one manually or by using the [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp) package.
+This package does not generate your `Content-Security-Policy` header for you, but you can create one manually or by using a package such as [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp).
 
 ### Building your own CSP
 You can set a CSP header manually on responses, and use this package to generate the correct value for the directives you need. For example, to set the `report-to` directive, you can do something like this in your controller or middleware:
@@ -119,7 +118,7 @@ Route::violations('optionalprefix');
 ```
 Be sure to update the URLs in your config if you change this prefix.
 
-Browsers will often send a preflight `OPTIONS` request to the reporting endpoint before sending the actual report, and these routes are also set up for you.
+Browsers will often send a preflight `OPTIONS` request to the reporting endpoint before sending the actual report, and these routes are also set up for you. None of these endpoints are intended to work directly in a browser; `GET` requests will result in `405 Method not Allowed` errors.
 
 ### Saving to the database
 When a report is received, it is parsed and stored in the database if you have set a table name in the config file (and run the associated migration, described above). There is a Violation model defined in `\Synchro\Violation\Models\Violation` that you can use to query the reports stored in the database. The `report` field of this model contains the complete, unaltered report received from the client, and you can parse it using the [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) DTO classes provided by this package (see below).
@@ -128,7 +127,7 @@ When a report is received, it is parsed and stored in the database if you have s
 On receiving a report, the package fires an event called `\Synchro\Violation\Events\Violation`, which you can listen for in your application to take further action, such as logging or alerting.
 
 ### Forwarding reports
-You can also optionally forward the report to an external service such as [report-uri.com](https://report-uri.com) and this is done by dispatching a job called `\Synchro\Violation\Jobs\ForwardReport` that will send the report to the configured endpoint.
+You can also optionally forward the report to an external service such as [report-uri.com](https://report-uri.com) by dispatching a job called `\Synchro\Violation\Jobs\ForwardReport` that will send the report to the configured endpoint.
 
 Even if you do not configure saving reports to the database, the package will still parse the reports and fire the event, so you can still take action on them without storing them locally.
 
@@ -157,8 +156,6 @@ Please review [our security policy](SECURITY.md) on how to report security vulne
 ## Support open source development
 
 This package was written by Marcus Bointon, [@Synchro on GitHub](https://github.com/Synchro), and is released under the MIT open-source license. If you rely on it, please consider becoming [a GitHub Sponsor](https://github.com/sponsors/Synchro).
-
-- [Marcus Bointon](https://github.com/Synchro)
 
 ## License
 
