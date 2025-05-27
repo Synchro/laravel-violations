@@ -31,17 +31,17 @@ class ViolationServiceProvider extends PackageServiceProvider
     {
         Route::macro('violations', function (string $baseUrl = 'violations') {
             Route::prefix($baseUrl)
-                 ->withoutMiddleware(ValidateCsrfToken::class)
-                 ->group(function () use ($baseUrl) {
-                     Route::options('csp', [ViolationController::class, 'options'])
-                          ->name($baseUrl.'.csp.options');
-                     Route::options('nel', [ViolationController::class, 'options'])
-                          ->name($baseUrl.'.nel.options');
-                     Route::post('csp', [ViolationController::class, 'csp'])
-                          ->name($baseUrl.'.csp');
-                     Route::post('nel', [ViolationController::class, 'nel'])
-                          ->name($baseUrl.'.nel');
-                 });
+                ->withoutMiddleware(ValidateCsrfToken::class)
+                ->group(function () use ($baseUrl) {
+                    Route::options('csp', [ViolationController::class, 'options'])
+                        ->name($baseUrl.'.csp.options');
+                    Route::options('nel', [ViolationController::class, 'options'])
+                        ->name($baseUrl.'.nel.options');
+                    Route::post('csp', [ViolationController::class, 'csp'])
+                        ->name($baseUrl.'.csp');
+                    Route::post('nel', [ViolationController::class, 'nel'])
+                        ->name($baseUrl.'.nel');
+                });
         });
     }
 }
