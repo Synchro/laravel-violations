@@ -36,7 +36,7 @@ class ForwardReport implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private Violation $violation)
+    public function __construct(private readonly Violation $violation)
     {
         //
     }
