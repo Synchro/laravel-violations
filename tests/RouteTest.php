@@ -1,21 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 use Synchro\Violation\Http\Controllers\ViolationController;
 
-it('can serve and OPTIONS request', function () {
-    // Mock the request to simulate an OPTIONS request
-    $this->withoutExceptionHandling(); // Optional: To see any exceptions thrown
-
-    // Ensure the middleware is applied
-    // $this->withMiddleware(\Synchro\Violation\Http\Middleware\AddReportingEndpointsHeader::class);
-
-    // Register a route for OPTIONS requests
-    Route::options('/csp/options', [ViolationController::class, 'options']);
-
-    // Make an OPTIONS request to this route
-    $response = $this->call('OPTIONS', '/csp/options');
-
+it('can serve an OPTIONS request', function () {
+    $this->withoutExceptionHandling();
+    $response = $this->call('OPTIONS', action([ViolationController::class, 'csp']));
     expect($response->status())
         ->toBe(204)
         ->and($response->headers->get('Access-Control-Allow-Methods'))
@@ -25,16 +15,7 @@ it('can serve and OPTIONS request', function () {
 });
 
 it('can receive a CSP report-uri report', function () {
-    // Mock the request to simulate a CSP violation report
-    $this->withoutExceptionHandling(); // Optional: To see any exceptions thrown
-
-    // Ensure the middleware is applied
-    // $this->withMiddleware(\Synchro\Violation\Http\Middleware\AddReportingEndpointsHeader::class);
-
-    // Register a route for receiving CSP reports
-    Route::post('/csp/reports', [ViolationController::class, 'csp']);
-
-    // Make a POST request to this route with the CSP content type
+    $this->withoutExceptionHandling();
     $reportData =
         [
             'csp-report' => [
@@ -52,7 +33,7 @@ it('can receive a CSP report-uri report', function () {
         ];
     $response = $this->call(
         'POST',
-        '/csp/reports',
+        action([ViolationController::class, 'csp']),
         [],
         [],
         [],
@@ -61,9 +42,41 @@ it('can receive a CSP report-uri report', function () {
             'CONTENT_LENGTH' => strlen(json_encode($reportData)),
             'HTTP_ACCEPT' => '*/*',
         ],
-        json_encode($reportData)
+        json_encode($reportData),
     );
 
-    expect($response->status())->toBe(204);
-    expect($response->content())->toBeEmpty();
+    expect($response->status())
+        ->toBe(204)
+        ->and($response->content())
+        ->toBeEmpty();
+});
+
+it('rejects invalid JSON', function () {
+    $response = $this->call(
+        'POST',
+        action([ViolationController::class, 'csp']),
+        [],
+        [],
+        [],
+        [
+            'CONTENT_TYPE' => 'application/csp-report',
+            'CONTENT_LENGTH' => 0,
+            'HTTP_ACCEPT' => '*/*',
+        ],
+        '{"name": "csp",',
+    );
+
+    expect($response->status())->toBe(400);
+});
+
+it('rejects prohibited HTTP verbs', function () {
+    $endpoint = action([ViolationController::class, 'csp']);
+    $response = $this->call('GET', $endpoint);
+    expect($response->status())->toBe(Response::HTTP_METHOD_NOT_ALLOWED);
+    $response = $this->call('PUT', $endpoint);
+    expect($response->status())->toBe(Response::HTTP_METHOD_NOT_ALLOWED);
+    $response = $this->call('PATCH', $endpoint);
+    expect($response->status())->toBe(Response::HTTP_METHOD_NOT_ALLOWED);
+    $response = $this->call('DELETE', $endpoint);
+    expect($response->status())->toBe(Response::HTTP_METHOD_NOT_ALLOWED);
 });

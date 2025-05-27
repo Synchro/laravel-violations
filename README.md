@@ -113,7 +113,14 @@ NEL: {"report-to": "nel"}
 Just like CSP, creating this header is left up to you, but note that the `report-to` target URLs *are* managed by this package, so use the same names.
 
 ## Receiving reports
-The package provides routes that you can use to receive reports. By default, is configured to receive both CSP and NEL reports at `/csp` and `/nel` respectively, but you can change them in the config file.
+The package provides a route macro that you can use to define all the routes you need to receive reports. By default, it is configured to receive CSP and NEL reports at `/violations/csp` and `/violations/nel` respectively, though you can change the prefix by passing it a prefix of your own choosing, like this:
+
+```php
+Route::violations('optionalprefix');
+```
+Be sure to update the URLs in your config if you change this prefix.
+
+Browsers will often send a preflight `OPTIONS` request to the reporting endpoint before sending the actual report, and these routes are also set up for you.
 
 ### Saving to the database
 When a report is received, it is parsed and stored in the database if you have set a table name in the config file (and run the associated migration, described above). There is a Violation model defined in `\Synchro\Violation\Models\Violation` that you can use to query the reports stored in the database. The `report` field of this model contains the complete, unaltered report received from the client, and you can parse it using the [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) DTO classes provided by this package (see below).
