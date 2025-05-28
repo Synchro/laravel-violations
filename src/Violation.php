@@ -8,7 +8,8 @@ class Violation
 {
     /**
      * Get the value for the CSP report-uri directive.
-     * This CSP directive is deprecated, but use it at the same time as report-to to provide backward compatibility.
+     * The report-uri directive is deprecated in level 3,
+     * but use it at the same time as report-to to provide backward compatibility with level 2.
      */
     public static function cspReportUri(): string
     {
@@ -20,7 +21,7 @@ class Violation
 
     /**
      * Get the value for the CSP report-to directive.
-     * This directive is used for CSP level 2 and 3 client-side reporting.
+     * This directive is used for CSP level 3.
      */
     public static function cspReportTo(): string
     {
@@ -41,7 +42,7 @@ class Violation
             ->map(function ($endpoint) {
                 $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
 
-                return $endpoint['name'].'='.$url;
+                return $endpoint['name'].'="'.$url.'"';
             })
             ->implode(' ');
     }
