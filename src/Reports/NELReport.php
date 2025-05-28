@@ -8,6 +8,7 @@ use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Data;
+use Synchro\Violation\Enums\NetworkReportingReportType;
 
 /**
  * Class representing a Network Error Logging report sent to a report-to URL in a CSP.
@@ -20,12 +21,12 @@ class NELReport extends Data
         // The network error report structure
         readonly public NELBody $body,
         // The client's user-agent string
-        #[MapInputName('user-agent')]
+        #[MapInputName('user_agent')]
         readonly public string $userAgent = '',
         // The target destination
         readonly public string $destination = '',
         // What kind of error report this is
-        readonly public string $type = 'nel',
+        readonly public NetworkReportingReportType $type = NetworkReportingReportType::NEL,
         // The number of milliseconds between report generation and the time the error occurred
         #[Min(0)]
         readonly public int $age = 0,

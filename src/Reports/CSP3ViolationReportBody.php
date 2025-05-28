@@ -18,9 +18,9 @@ use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
  */
 class CSP3ViolationReportBody extends Data
 {
-    public const MIME_TYPE = 'application/csp-report';
+    public const string MIME_TYPE = 'application/csp-report';
 
-    public const TYPE = 'csp-violation';
+    public const string TYPE = 'csp-violation';
 
     public function __construct(
         // The address of the document where the violation occurred.

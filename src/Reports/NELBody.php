@@ -18,7 +18,7 @@ use Spatie\LaravelData\Data;
  */
 class NELBody extends Data
 {
-    public const type = 'network-error';
+    public const string TYPE = 'network-error';
 
     /**
      * @param  array<string, array<string>>  $requestHeaders
@@ -31,6 +31,9 @@ class NELBody extends Data
         // How long this took.
         #[MapInputName('elapsed-time'), Min(0)]
         readonly public int $elapsedTime = 0,
+        // How long after the request this happened.
+        #[MapInputName('age'), Min(0)]
+        readonly public int $age = 0,
         // At what point in request processing this happened.
         readonly public string $phase = '',
         // The type of the network error

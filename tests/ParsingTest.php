@@ -1,5 +1,6 @@
 <?php
 
+use Synchro\Violation\Enums\NetworkReportingReportType;
 use Synchro\Violation\Reports\CSP2ReportData;
 use Synchro\Violation\Reports\NELReport;
 
@@ -23,33 +24,47 @@ it('parses a CSP2 report', function () {
 
     $data = CSP2ReportData::from($report);
 
-    expect($data->cspReport->documentUri)->toBe('http://example.org/page.html');
-    expect($data->cspReport->violatedDirective)->toBe("default-src 'self'");
+    expect($data->cspReport->documentUri)
+        ->toBe('http://example.org/page.html')
+        ->and($data->cspReport->referrer)->toBe('http://evil.example.com/haxor.html')
+        ->and($data->cspReport->blockedUri)->toBe('http://evil.example.com/image.png')
+        ->and($data->cspReport->violatedDirective)->toBe("default-src 'self'")
+        ->and($data->cspReport->effectiveDirective)->toBe('img-src')
+        ->and($data->cspReport->originalPolicy)->toBe("default-src 'self'; report-uri http://example.org/csp-report.cgi");
 });
 
 it('parses an NEL report', function () {
     $report = json_decode(
         '{
-  "type": "nel",
+  "type": "network-error",
   "age": 29,
   "url": "https://example.com/thing.js",
   "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
   "body": {
     "referrer": "https://www.example.com/",
     "server-ip": "192.168.0.123",
-    "protocol": "",
-    "status-code": 0,
+    "protocol": "xyz",
+    "status-code": 323,
     "elapsed-time": 143,
-    "age": 0,
+    "age": 5,
     "type": "http.dns.name_not_resolved"
   }
 }',
         true,
         512,
-        JSON_THROW_ON_ERROR
+        JSON_THROW_ON_ERROR,
     );
     $data = NELReport::from($report);
-
-    expect($data->body->referrer)->toBe('https://www.example.com/');
-    expect($data->body->serverIp)->toBe('192.168.0.123');
+    expect($data->type)
+        ->toBe(NetworkReportingReportType::NEL)
+        ->and($data->age)->toBe(29)
+        ->and($data->url)->toBe('https://example.com/thing.js')
+        ->and($data->userAgent)->toBe('Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0')
+        ->and($data->body->referrer)->toBe('https://www.example.com/')
+        ->and($data->body->serverIp)->toBe('192.168.0.123')
+        ->and($data->body->protocol)->toBe('xyz')
+        ->and($data->body->statusCode)->toBe(323)
+        ->and($data->body->elapsedTime)->toBe(143)
+        ->and($data->body->age)->toBe(5)
+        ->and($data->body->type)->toBe('http.dns.name_not_resolved');
 });
