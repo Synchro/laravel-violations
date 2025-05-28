@@ -14,7 +14,7 @@ use Spatie\LaravelData\Data;
  *
  * @see https://www.w3.org/TR/CSP2/#violation-reports
  */
-class CSPReport extends Data
+class CSP2Report extends Data
 {
     public const string TYPE = 'csp-report';
 

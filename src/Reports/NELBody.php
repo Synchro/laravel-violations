@@ -26,17 +26,17 @@ class NELBody extends Data
      */
     public function __construct(
         // The sampling fraction used to determine this report.
-        #[MapInputName('sampling_fraction'), Min(0), Max(1)]
+        #[MapInputName('sampling-fraction'), Min(0), Max(1)]
         readonly public float $samplingFraction = 1.0,
         // How long this took.
-        #[MapInputName('elapsed_time'), Min(0)]
+        #[MapInputName('elapsed-time'), Min(0)]
         readonly public int $elapsedTime = 0,
-        // At what point in request processing did this happen.
+        // At what point in request processing this happened.
         readonly public string $phase = '',
         // The type of the network error
         readonly public string $type = '',
         // The IP address of the server that was contacted.
-        #[MapInputName('server_ip'), IPv4, IPv6]
+        #[MapInputName('server-ip'), IPv4, IPv6]
         readonly public string $serverIp = '',
         // The protocol used to make the request.
         readonly public string $protocol = '',
@@ -45,15 +45,15 @@ class NELBody extends Data
         // The HTTP method that triggered the error.
         readonly public string $method = '',
         // The HTTP status code received (can be 0 for non-HTTP errors, e.g. DNS).
-        #[MapInputName('status_code'), Min(0), Max(599)]
+        #[MapInputName('status-code'), Min(0), Max(599)]
         readonly public int $statusCode = 0,
         // The URL of the resource where the violation occurred.
         readonly public string $url = '',
         // The headers from the request
-        #[MapInputName('request_headers')]
+        #[MapInputName('request-headers')]
         readonly public array $requestHeaders = [],
         // The headers from the response
-        #[MapInputName('response_headers')]
+        #[MapInputName('response-headers')]
         readonly public array $responseHeaders = [],
     ) {}
 }

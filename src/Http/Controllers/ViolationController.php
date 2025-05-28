@@ -15,7 +15,7 @@ use Synchro\Violation\Enums\ReportType;
 use Synchro\Violation\Events\Violation as ViolationEvent;
 use Synchro\Violation\Jobs\ForwardReport;
 use Synchro\Violation\Models\Violation;
-use Synchro\Violation\Reports\CSPReportData;
+use Synchro\Violation\Reports\CSP2ReportData;
 use Synchro\Violation\Reports\NELReport;
 
 class ViolationController extends Controller
@@ -48,7 +48,7 @@ class ViolationController extends Controller
             abort(Response::HTTP_BAD_REQUEST, 'Invalid JSON data');
         }
         // Manually create the DTO from the decoded JSON data
-        $report = CSPReportData::from($request->getContent());
+        $report = CSP2ReportData::from($request->getContent());
         // Make a violation model instance
         $violation = new Violation([
             'report' => $report->toJson(),
@@ -97,7 +97,7 @@ class ViolationController extends Controller
     public function options(Request $request): Response
     {
         // Allow any origin and allow the OPTIONS method
-        // Note that GET, POST, and HEAD are always allowed
+        // Note that GET, POST, and HEAD are always allowed, so we don't need to list them
         $headers = [
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'OPTIONS',
@@ -106,7 +106,7 @@ class ViolationController extends Controller
         // If the request includes an Access-Control-Request-Headers header,
         // extract the allowed headers and set the Access-Control-Allow-Headers header
         if ($request->hasHeader('Access-Control-Request-Headers')) {
-            if (! $this->validateAccessControlRequestHeaders($request->header('Access-Control-Request-Headers'))) {
+            if (! self::validateAccessControlRequestHeaders($request->header('Access-Control-Request-Headers'))) {
                 return response('Invalid headers requested', 400);
             }
             // If we get here, all the requested headers are in the allowlist, so just copy the whole thing back to the response
@@ -117,7 +117,7 @@ class ViolationController extends Controller
         return response('', 204, $headers);
     }
 
-    private function validateAccessControlRequestHeaders(string $headerValue): bool
+    private static function validateAccessControlRequestHeaders(string $headerValue): bool
     {
         // Normalize allowed headers to lowercase
         $allowedHeaders = array_map('strtolower', self::ALLOWED_HEADERS);
@@ -131,12 +131,16 @@ class ViolationController extends Controller
         }, $requestedHeaders);
 
         // Check if all requested headers are in the allowed list
-        foreach ($requestedHeaders as $header) {
-            if (! in_array($header, self::ALLOWED_HEADERS)) {
-                return false;
-            }
-        }
+        return array_all($requestedHeaders, fn ($header) => in_array($header, self::ALLOWED_HEADERS));
+    }
 
-        return true;
+    /**
+     * Reports from CSP & NEL report-to endpoints can contain either a bare report object or an array of multiple report objects.
+     * Check whether the array is multiple reports or just one.
+     */
+    private static function isArrayOfReports(array $reports): bool
+    {
+        // Check if the array is empty or contains only arrays
+        return ! empty($reports) && collect($reports)->every(fn ($report) => is_array($report));
     }
 }

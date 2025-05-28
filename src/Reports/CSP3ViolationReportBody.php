@@ -16,7 +16,7 @@ use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
  * https://w3c.github.io/webappsec-csp/#csp-violation-report
  * https://w3c.github.io/webappsec-csp/#cspviolationreportbody
  */
-class CSPViolationReportBody extends Data
+class CSP3ViolationReportBody extends Data
 {
     public const MIME_TYPE = 'application/csp-report';
 
