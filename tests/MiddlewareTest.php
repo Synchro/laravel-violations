@@ -30,7 +30,7 @@ it('adds reporting headers when endpoints are configured', function () {
     expect($response->headers->has('Reporting-Endpoints'))
         ->toBeTrue()
         ->and($response->headers->get('Reporting-Endpoints'))
-        ->toBe('csp="'.url('csp').'" nel="'.url('nel').'"')
+        ->toBe('csp="'.url('csp').'", nel="'.url('nel').'"')
         ->and($response->headers->has('Report-To'))
         ->toBeTrue()
         ->and($response->headers->get('Report-To'))

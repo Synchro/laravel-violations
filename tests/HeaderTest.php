@@ -11,5 +11,5 @@ it('can create a Reporting-Endpoints header value', function () {
     $reportTo = Synchro\Violation\Violation::reportingEndpointsHeaderValue();
 
     expect($reportTo)
-        ->toBe('csp="http://localhost/violations/csp" nel="http://localhost/violations/nel"');
+        ->toBe('csp="http://localhost/violations/csp", nel="http://localhost/violations/nel"');
 });

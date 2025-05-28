@@ -44,7 +44,7 @@ class Violation
 
                 return $endpoint['name'].'="'.$url.'"';
             })
-            ->implode(' ');
+            ->implode(', ');
     }
 
     /**
