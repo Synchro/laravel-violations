@@ -34,9 +34,10 @@ it('adds reporting headers when endpoints are configured', function () {
         ->and($response->headers->has('Report-To'))
         ->toBeTrue()
         ->and($response->headers->get('Report-To'))
-        ->toBe('[{"group":"csp","max_age":86400,"endpoints":[{"url":'
-               .json_encode(url('csp')).'}]},{"group":"nel","max_age":86400,"endpoints":[{"url":'
-               .json_encode(url('nel')).'}]}]'
+        ->toBe(
+            '[{"group":"csp","max_age":86400,"endpoints":[{"url":'
+            .json_encode(url('csp')).'}]},{"group":"nel","max_age":86400,"endpoints":[{"url":'
+            .json_encode(url('nel')).'}]}]',
         );
 });
 
