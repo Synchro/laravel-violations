@@ -15,8 +15,8 @@ class ReportFactory
         $type = $data['type'];
 
         return match ($type) {
-            NetworkReportingReportType::NEL->value, 'network-error' => NELReport::from($data),
-            NetworkReportingReportType::CSP->value, 'csp-violation' => CSP3ViolationReport::from($data),
+            NetworkReportingReportType::NEL->value => NELReport::from($data),
+            NetworkReportingReportType::CSP->value => CSP3ViolationReport::from($data),
             default => throw new \InvalidArgumentException("Unsupported report type: {$type}"),
         };
     }

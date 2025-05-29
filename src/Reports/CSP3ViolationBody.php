@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Synchro\Violation\Reports;
 
-use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
@@ -23,37 +23,37 @@ class CSP3ViolationBody extends ReportBody
 
     public function __construct(
         // The address of the document where the violation occurred.
-        #[MapInputName('documentURI')]
+        #[MapName('documentURI')]
         readonly public string $documentUri = '',
         // The referrer attribute of the document where the violation occurred.
         readonly public string $referrer = '',
         // The URI that was blocked from loading due to the policy violation.
-        #[MapInputName('blockedURI')]
+        #[MapName('blockedURI')]
         readonly public string $blockedUri = '',
         // The effective directive after applying the fallback directives (if any).
-        #[MapInputName('effectiveDirective')]
+        #[MapName('effectiveDirective')]
         readonly public string $effectiveDirective = '',
         // The effective directive after applying the fallback directives (if any).
-        #[MapInputName('violatedDirective')]
+        #[MapName('violatedDirective')]
         readonly public string $violatedDirective = '',
         // The original policy as specified in the Content-Security-Policy HTTP header
-        #[MapInputName('originalPolicy')]
+        #[MapName('originalPolicy')]
         readonly public string $originalPolicy = '',
         // The URL of the resource where the violation occurred (for inline script and style violations).
-        #[MapInputName('source-file')]
+        #[MapName('source-file')]
         readonly public ?string $sourceFile = null,
         // Script sample (for inline script and style violations)
         readonly public string $sample = '',
         // Violation’s disposition, "enforce" or "report"
         readonly public SecurityPolicyViolationEventDisposition $disposition = SecurityPolicyViolationEventDisposition::Enforce,
         // The HTTP status code of the resource on which the policy was applied
-        #[MapInputName('status-code'), Min(0), Max(599)]
+        #[MapName('status-code'), Min(0), Max(599)]
         readonly public int $statusCode = 0,
         // The line number in the source file where the violation occurred (for inline script and style violations)
-        #[MapInputName('line-number'), Min(0)]
+        #[MapName('line-number'), Min(0)]
         readonly public ?int $lineNumber = null,
         // The column number in the source file where the violation occurred (for inline script and style violations)
-        #[MapInputName('column-number'), Min(0)]
+        #[MapName('column-number'), Min(0)]
         readonly public ?int $columnNumber = null,
     ) {}
 }

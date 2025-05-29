@@ -52,7 +52,7 @@ it('parses a CSP3 report', function () {
         512,
         JSON_THROW_ON_ERROR,
     );
-    $data = ReportFactory::from($report);
+    $data   = ReportFactory::from($report);
     expect($data->type)
         ->toBe(NetworkReportingReportType::CSP)
         ->and($data->age)->toBe(5)
@@ -72,14 +72,27 @@ it('parses an NEL report', function () {
   "age": 29,
   "url": "https://example.com/thing.js",
   "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
+  "destination": "https://example.com/report",
+  "timestamp": 1700000000,
+  "attempts": 1,
   "body": {
+    "sampling-fraction": 1.0,
+    "elapsed-time": 143,
+    "age": 5,
+    "phase": "dns",
+    "type": "http.dns.name_not_resolved",
     "referrer": "https://www.example.com/",
     "server-ip": "192.168.0.123",
     "protocol": "xyz",
+    "method": "GET",
     "status-code": 323,
-    "elapsed-time": 143,
-    "age": 5,
-    "type": "http.dns.name_not_resolved"
+    "url": "https://example.com/thing.js",
+    "request-headers": {
+      "User-Agent": ["Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"]
+    },
+    "response-headers": {
+      "Content-Type": ["application/javascript"]
+    }
   }
 }',
         true,
@@ -92,11 +105,61 @@ it('parses an NEL report', function () {
         ->and($data->age)->toBe(29)
         ->and($data->url)->toBe('https://example.com/thing.js')
         ->and($data->userAgent)->toBe('Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0')
+        ->and($data->destination)->toBe('https://example.com/report')
+        ->and($data->timestamp)->toBe(1700000000)
+        ->and($data->attempts)->toBe(1)
+        ->and($data->body->samplingFraction)->toBe(1.0)
         ->and($data->body->referrer)->toBe('https://www.example.com/')
         ->and($data->body->serverIp)->toBe('192.168.0.123')
         ->and($data->body->protocol)->toBe('xyz')
+        ->and($data->body->method)->toBe('GET')
         ->and($data->body->statusCode)->toBe(323)
         ->and($data->body->elapsedTime)->toBe(143)
         ->and($data->body->age)->toBe(5)
-        ->and($data->body->type)->toBe('http.dns.name_not_resolved');
+        ->and($data->body->type)->toBe('http.dns.name_not_resolved')
+        ->and($data->body->phase)->toBe('dns')
+        ->and($data->body->url)->toBe('https://example.com/thing.js')
+        ->and($data->body->requestHeaders)->toEqual([
+            'User-Agent' => ['Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0'],
+        ])
+        ->and($data->body->responseHeaders)->toEqual([
+            'Content-Type' => ['application/javascript'],
+        ]);;
 });
+
+it('can reconstruct an NEL report', function () {
+    $report        = '{
+  "type": "network-error",
+  "age": 29,
+  "url": "https://example.com/thing.js",
+  "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
+  "destination": "https://example.com/report",
+  "timestamp": 1700000000,
+  "attempts": 1,
+  "body": {
+    "sampling-fraction": 1.0,
+    "elapsed-time": 143,
+    "age": 5,
+    "phase": "dns",
+    "type": "http.dns.name_not_resolved",
+    "referrer": "https://www.example.com/",
+    "server-ip": "192.168.0.123",
+    "protocol": "xyz",
+    "method": "GET",
+    "status-code": 323,
+    "url": "https://example.com/thing.js",
+    "request-headers": {
+      "User-Agent": ["Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"]
+    },
+    "response-headers": {
+      "Content-Type": ["application/javascript"]
+    }
+  }
+}';
+    $data          = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    $reconstructed = $data->toArray();
+    dump($reconstructed, json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    expect($reconstructed)
+        ->toEqualCanonicalizing(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+})
+    ->skip();

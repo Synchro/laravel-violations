@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Synchro\Violation\Reports;
 
-use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Data;
@@ -19,11 +19,11 @@ class NELReport extends Data
 {
     public function __construct(
         // The report type
-        readonly public NetworkReportingReportType $type,
+        readonly public NetworkReportingReportType $type = NetworkReportingReportType::NEL,
         // The report body containing NEL-specific data
         readonly public NELBody $body,
         // The client's user-agent string
-        #[MapInputName('user_agent')]
+        #[MapName('user_agent')]
         readonly public string $userAgent = '',
         // The number of milliseconds between report generation and the time the error occurred
         #[Min(0)]
