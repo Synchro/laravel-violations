@@ -86,7 +86,7 @@ it('parses an NEL report', function () {
         512,
         JSON_THROW_ON_ERROR,
     );
-    $data   = ReportFactory::from($report);
+    $data = ReportFactory::from($report);
     expect($data->type)
         ->toBe(NetworkReportingReportType::NEL)
         ->and($data->age)->toBe(29)
