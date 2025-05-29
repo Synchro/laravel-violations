@@ -19,7 +19,7 @@ class NELReport extends Data
 {
     public function __construct(
         // The report type
-        readonly public NetworkReportingReportType $type = NetworkReportingReportType::NEL,
+        readonly public NetworkReportingReportType $type,
         // The report body containing NEL-specific data
         readonly public NELBody $body,
         // The client's user-agent string

@@ -52,7 +52,7 @@ it('parses a CSP3 report', function () {
         512,
         JSON_THROW_ON_ERROR,
     );
-    $data   = ReportFactory::from($report);
+    $data = ReportFactory::from($report);
     expect($data->type)
         ->toBe(NetworkReportingReportType::CSP)
         ->and($data->age)->toBe(5)
@@ -124,11 +124,11 @@ it('parses an NEL report', function () {
         ])
         ->and($data->body->responseHeaders)->toEqual([
             'Content-Type' => ['application/javascript'],
-        ]);;
+        ]);
 });
 
 it('can reconstruct an NEL report', function () {
-    $report        = '{
+    $report = '{
   "type": "network-error",
   "age": 29,
   "url": "https://example.com/thing.js",
@@ -156,7 +156,7 @@ it('can reconstruct an NEL report', function () {
     }
   }
 }';
-    $data          = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    $data = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
     $reconstructed = $data->toArray();
     dump($reconstructed, json_decode($report, true, 512, JSON_THROW_ON_ERROR));
     expect($reconstructed)
