@@ -9,17 +9,14 @@ use Spatie\LaravelData\Attributes\Validation\IPv4;
 use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
-use Spatie\LaravelData\Data;
 
 /**
  * Class representing a Network Error Report body sent to a report-to URL in an NEL header.
  *
  * @see https://w3c.github.io/network-error-logging/#generate-a-network-error-report
  */
-class NELBody extends Data
+class NELBody extends ReportBody
 {
-    public const string TYPE = 'network-error';
-
     /**
      * @param  array<string, array<string>>  $requestHeaders
      * @param  array<string, array<string>>  $responseHeaders

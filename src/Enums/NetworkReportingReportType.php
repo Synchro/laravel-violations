@@ -11,12 +11,4 @@ enum NetworkReportingReportType: string
 {
     case NEL = 'network-error';
     case CSP = 'csp-violation';
-
-    public function label(): string
-    {
-        return match ($this) {
-            self::NEL => 'network-error',
-            self::CSP => 'csp-violation',
-        };
-    }
 }

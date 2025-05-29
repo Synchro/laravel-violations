@@ -7,16 +7,15 @@ namespace Synchro\Violation\Reports;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
-use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
 
 /**
- * DTO representing a Content Security Policy level-3 csp-violation report sent to
- * a URL referenced by a report-to CSP directive endpoint.
+ * DTO representing the body of a Content Security Policy level-3 csp-violation report sent to
+ * an endpoint referenced by a report-to CSP directive endpoint.
  * https://w3c.github.io/webappsec-csp/#csp-violation-report
  * https://w3c.github.io/webappsec-csp/#cspviolationreportbody
  */
-class CSP3ViolationReportBody extends Data
+class CSP3ViolationBody extends ReportBody
 {
     public const string MIME_TYPE = 'application/csp-report';
 
@@ -24,21 +23,21 @@ class CSP3ViolationReportBody extends Data
 
     public function __construct(
         // The address of the document where the violation occurred.
-        #[MapInputName('document-uri')]
+        #[MapInputName('documentURI')]
         readonly public string $documentUri = '',
         // The referrer attribute of the document where the violation occurred.
         readonly public string $referrer = '',
         // The URI that was blocked from loading due to the policy violation.
-        #[MapInputName('blocked-uri')]
+        #[MapInputName('blockedURI')]
         readonly public string $blockedUri = '',
         // The effective directive after applying the fallback directives (if any).
-        #[MapInputName('effective-directive')]
+        #[MapInputName('effectiveDirective')]
         readonly public string $effectiveDirective = '',
         // The effective directive after applying the fallback directives (if any).
-        #[MapInputName('violated-directive')]
+        #[MapInputName('violatedDirective')]
         readonly public string $violatedDirective = '',
         // The original policy as specified in the Content-Security-Policy HTTP header
-        #[MapInputName('original-policy')]
+        #[MapInputName('originalPolicy')]
         readonly public string $originalPolicy = '',
         // The URL of the resource where the violation occurred (for inline script and style violations).
         #[MapInputName('source-file')]

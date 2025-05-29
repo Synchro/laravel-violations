@@ -2,7 +2,7 @@
 
 use Synchro\Violation\Enums\NetworkReportingReportType;
 use Synchro\Violation\Reports\CSP2ReportData;
-use Synchro\Violation\Reports\NELReport;
+use Synchro\Violation\Reports\ReportFactory;
 
 it('parses a CSP2 report', function () {
     // Example report from https://www.w3.org/TR/CSP2/#example-violation-report
@@ -33,6 +33,38 @@ it('parses a CSP2 report', function () {
         ->and($data->cspReport->originalPolicy)->toBe("default-src 'self'; report-uri http://example.org/csp-report.cgi");
 });
 
+it('parses a CSP3 report', function () {
+    $report = json_decode(
+        '{
+  "age": 5,
+  "type": "csp-violation",
+  "url": "https://example.com/page1",
+  "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
+  "body": {
+    "documentURI": "https://example.com/page2",
+    "blockedURI": "https://evil.com/script.js",
+    "violatedDirective": "script-src \'self\'",
+    "effectiveDirective": "img-src \'self\'",
+    "originalPolicy": "script-src \'self\'; report-to csp-endpoint"
+  }
+}',
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    );
+    $data = ReportFactory::from($report);
+    expect($data->type)
+        ->toBe(NetworkReportingReportType::CSP)
+        ->and($data->age)->toBe(5)
+        ->and($data->url)->toBe('https://example.com/page1')
+        ->and($data->userAgent)->toBe('Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0')
+        ->and($data->body->documentUri)->toBe('https://example.com/page2')
+        ->and($data->body->blockedUri)->toBe('https://evil.com/script.js')
+        ->and($data->body->violatedDirective)->toBe('script-src \'self\'')
+        ->and($data->body->effectiveDirective)->toBe('img-src \'self\'')
+        ->and($data->body->originalPolicy)->toBe('script-src \'self\'; report-to csp-endpoint');
+});
+
 it('parses an NEL report', function () {
     $report = json_decode(
         '{
@@ -54,7 +86,7 @@ it('parses an NEL report', function () {
         512,
         JSON_THROW_ON_ERROR,
     );
-    $data = NELReport::from($report);
+    $data   = ReportFactory::from($report);
     expect($data->type)
         ->toBe(NetworkReportingReportType::NEL)
         ->and($data->age)->toBe(29)

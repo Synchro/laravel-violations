@@ -11,17 +11,17 @@ use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\NetworkReportingReportType;
 
 /**
- * Class representing a Network Error Logging report sent to a report-to endpoint.
+ * Class representing a CSP3 violation report sent to a report-to endpoint.
  *
  * @see https://www.w3.org/TR/reporting-1/#queue-report
  */
-class NELReport extends Data
+class CSP3ViolationReport extends Data
 {
     public function __construct(
-        // The report type 
-        readonly public NetworkReportingReportType $type = NetworkReportingReportType::NEL,
-        // The report body containing NEL-specific data
-        readonly public NELBody $body,
+        // The report type
+        readonly public NetworkReportingReportType $type = NetworkReportingReportType::CSP,
+        // The report body containing CSP-specific violation data
+        readonly public CSP3ViolationBody $body,
         // The client's user-agent string
         #[MapInputName('user_agent')]
         readonly public string $userAgent = '',
@@ -43,6 +43,6 @@ class NELReport extends Data
 
     public function getReportType(): NetworkReportingReportType
     {
-        return NetworkReportingReportType::NEL;
+        return NetworkReportingReportType::CSP;
     }
 }
