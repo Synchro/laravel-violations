@@ -158,8 +158,8 @@ it('can reconstruct an NEL report', function () {
 }';
     $data = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
     $reconstructed = $data->toArray();
-    dump($reconstructed, json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    // We don't necessarily expect everything in the submitted report to be present in our reconstructed one,
+    // but we do expect the reconstructed one to be a subset of the original report
     expect($reconstructed)
-        ->toEqualCanonicalizing(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
-})
-    ->skip();
+        ->toBeASubsetOf(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+});
