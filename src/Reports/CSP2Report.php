@@ -21,10 +21,10 @@ class CSP2Report extends Data
     public function __construct(
         // The URI that was blocked from loading due to the policy violation.
         #[MapInputName('blocked-uri')]
-        readonly public string $blockedUri = '',
+        readonly public string $blockedURI = '',
         // The address of the document where the violation occurred.
         #[MapInputName('document-uri')]
-        readonly public string $documentUri = '',
+        readonly public string $documentURI = '',
         // The name of the policy directive that was violated.
         // This will contain the directive whose enforcement triggered the violation (e.g. "script-src")
         // even if that directive does not explicitly appear in the policy, but is implicitly activated

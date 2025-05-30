@@ -24,10 +24,10 @@ it('parses a CSP2 report', function () {
 
     $data = CSP2ReportData::from($report);
 
-    expect($data->cspReport->documentUri)
+    expect($data->cspReport->documentURI)
         ->toBe('http://example.org/page.html')
         ->and($data->cspReport->referrer)->toBe('http://evil.example.com/haxor.html')
-        ->and($data->cspReport->blockedUri)->toBe('http://evil.example.com/image.png')
+        ->and($data->cspReport->blockedURI)->toBe('http://evil.example.com/image.png')
         ->and($data->cspReport->violatedDirective)->toBe("default-src 'self'")
         ->and($data->cspReport->effectiveDirective)->toBe('img-src')
         ->and($data->cspReport->originalPolicy)->toBe("default-src 'self'; report-uri http://example.org/csp-report.cgi");
@@ -41,8 +41,8 @@ it('parses a CSP3 report', function () {
   "url": "https://example.com/page1",
   "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
   "body": {
-    "documentURI": "https://example.com/page2",
-    "blockedURI": "https://evil.com/script.js",
+    "documentURL": "https://example.com/page2",
+    "blockedURL": "https://evil.com/script.js",
     "violatedDirective": "script-src \'self\'",
     "effectiveDirective": "img-src \'self\'",
     "originalPolicy": "script-src \'self\'; report-to csp-endpoint"
@@ -58,8 +58,8 @@ it('parses a CSP3 report', function () {
         ->and($data->age)->toBe(5)
         ->and($data->url)->toBe('https://example.com/page1')
         ->and($data->userAgent)->toBe('Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0')
-        ->and($data->body->documentUri)->toBe('https://example.com/page2')
-        ->and($data->body->blockedUri)->toBe('https://evil.com/script.js')
+        ->and($data->body->documentURL)->toBe('https://example.com/page2')
+        ->and($data->body->blockedURL)->toBe('https://evil.com/script.js')
         ->and($data->body->violatedDirective)->toBe('script-src \'self\'')
         ->and($data->body->effectiveDirective)->toBe('img-src \'self\'')
         ->and($data->body->originalPolicy)->toBe('script-src \'self\'; report-to csp-endpoint');

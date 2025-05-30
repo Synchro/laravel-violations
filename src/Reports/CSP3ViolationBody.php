@@ -23,13 +23,13 @@ class CSP3ViolationBody extends ReportBody
 
     public function __construct(
         // The address of the document where the violation occurred.
-        #[MapName('documentURI')]
-        readonly public string $documentUri = '',
+        #[MapName('documentURL')]
+        readonly public string $documentURL = '',
         // The referrer attribute of the document where the violation occurred.
         readonly public string $referrer = '',
         // The URI that was blocked from loading due to the policy violation.
-        #[MapName('blockedURI')]
-        readonly public string $blockedUri = '',
+        #[MapName('blockedURL')]
+        readonly public string $blockedURL = '',
         // The effective directive after applying the fallback directives (if any).
         #[MapName('effectiveDirective')]
         readonly public string $effectiveDirective = '',
