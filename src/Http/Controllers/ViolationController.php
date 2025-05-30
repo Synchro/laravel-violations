@@ -23,7 +23,7 @@ class ViolationController extends Controller
     use DispatchesJobs;
     use ValidatesRequests;
 
-    private const ALLOWED_HEADERS = [
+    private const array ALLOWED_HEADERS = [
         'content-type',
         'origin',
         'accept',
@@ -126,12 +126,12 @@ class ViolationController extends Controller
         $requestedHeaders = explode(',', $headerValue);
 
         // Trim and lowercase each requested header
-        $requestedHeaders = array_map(function ($header) {
+        $requestedHeaders = array_map(function (string $header) {
             return strtolower(trim($header));
         }, $requestedHeaders);
 
         // Check if all requested headers are in the allowed list
-        return array_all($requestedHeaders, fn ($header) => in_array($header, self::ALLOWED_HEADERS));
+        return array_all($requestedHeaders, fn (string $header) => in_array($header, self::ALLOWED_HEADERS));
     }
 
     /**
@@ -141,6 +141,6 @@ class ViolationController extends Controller
     private static function isArrayOfReports(array $reports): bool
     {
         // Check if the array is empty or contains only arrays
-        return ! empty($reports) && collect($reports)->every(fn ($report) => is_array($report));
+        return ! empty($reports) && collect($reports)->every(fn (mixed $report) => is_array($report));
     }
 }

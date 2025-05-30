@@ -21,17 +21,13 @@ class ForwardReport implements ShouldQueue
 
     /**
      * The number of times the job may be attempted.
-     *
-     * @var int
      */
-    public $tries = 3;
+    public int $tries = 3;
 
     /**
      * The maximum number of unhandled exceptions to allow before failing.
-     *
-     * @var int
      */
-    public $maxExceptions = 3;
+    public int $maxExceptions = 3;
 
     /**
      * Create a new job instance.

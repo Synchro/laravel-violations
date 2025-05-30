@@ -31,7 +31,7 @@ class QueueViolations extends Command
         progress(
             'Queuing reports',
             $violations,
-            function ($violation) {
+            function (Violation $violation) {
                 ForwardReport::dispatch($violation);
             }
         );

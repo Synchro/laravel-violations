@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Synchro\Violation\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Synchro\Violation\Violation;
 
@@ -16,11 +17,8 @@ class AddReportingHeaders
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         /** @var Response $response */
         $response = $next($request);

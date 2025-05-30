@@ -15,7 +15,7 @@ class Violation
     {
         return collect(config('violations.endpoints'))
             ->where('type', 'csp')
-            ->map(fn ($endpoint) => is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'])
+            ->map(fn (array $endpoint) => is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'])
             ->implode(' ');
     }
 
@@ -39,7 +39,7 @@ class Violation
     {
         return collect(config('violations.endpoints'))
             // Extract just the name and url from the endpoint list, format them as name=url
-            ->map(function ($endpoint) {
+            ->map(function (array $endpoint) {
                 $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
 
                 return $endpoint['name'].'="'.$url.'"';
@@ -54,7 +54,7 @@ class Violation
     public static function reportToHeaderValue(): string
     {
         return collect(config('violations.endpoints'))
-            ->map(function ($endpoint) {
+            ->map(function (array $endpoint) {
                 $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
 
                 return [
