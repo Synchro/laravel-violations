@@ -18,6 +18,7 @@ use Synchro\Violation\Enums\ReportSource;
  * @property ReportSource $report_source
  * @property string $user_agent
  * @property string $ip
+ * @property bool $forwarded
  * @property string $created_at
  * @property string $updated_at
  */
@@ -35,6 +36,7 @@ class Violation extends Model
         'report_source',
         'user_agent',
         'ip',
+        'forwarded',
         'created_at',
         'updated_at',
     ];

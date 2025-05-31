@@ -10,7 +10,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
-use Synchro\Violation\Models\Violation;
+use Spatie\LaravelData\Data;
+use Synchro\Violation\Enums\ReportSource;
 
 class ForwardReport implements ShouldQueue
 {
@@ -32,30 +33,27 @@ class ForwardReport implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private readonly Violation $violation)
-    {
+    public function __construct(
+        private readonly Data $report,
+        private readonly ReportSource $reportSource,
+        private readonly ?string $userAgent = null,
+        private readonly ?string $ip = null,
+    ) {
         //
     }
 
     public function handle(): void
     {
-        // Forward the report to our configured report-uri endpoint
-        if (config('violation.forward')) {
-            // Forward the report
-            $response = Http::withHeaders(
-                [
-                    'Content-Type' => 'application/reports+json',
-                    'User-Agent' => $this->violation->user_agent,
-                ]
-            )
-                ->post(config('violation.report_uri'),
-                    $this->violation->report
-                );
-
-            // If the report was successfully forwarded, record that in the database so we don't send it again
-            if ($response->successful() && config('violations.table')) {
-                $this->violation->update(['forwarded' => true]);
-            }
+        // Forward the report to our configured forward_to endpoint
+        $forwardTo = config('violations.forward_to');
+        
+        if ($forwardTo) {
+            // Forward the report as JSON
+            Http::withHeaders([
+                'Content-Type' => 'application/reports+json',
+                'User-Agent' => $this->userAgent,
+            ])
+            ->post($forwardTo, $this->report->toJson());
         }
     }
 }

@@ -49,48 +49,65 @@ class ViolationController extends Controller
         }
         // Manually create the DTO from the decoded JSON data
         $report = CSP2ReportData::from($request->getContent());
-        // Make a violation model instance
-        $violation = new Violation([
-            'report' => $report->toJson(),
-            'report_source' => ReportSource::REPORT_URI,
-            'user_agent' => (config('violations.sanitize') ? null : $request->header('User-Agent')),
-            'ip' => (config('violations.sanitize') ? null : $request->ip()),
-        ]);
+        
+        $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
+        $ip = config('violations.sanitize') ? null : $request->ip();
+        
         if (config('violations.table')) {
             // If DB storage is enabled, store the report in the database
-            // Store the report in the database
+            $violation = new Violation([
+                'report' => $report->toJson(),
+                'report_source' => ReportSource::REPORT_URI,
+                'user_agent' => $userAgent,
+                'ip' => $ip,
+            ]);
             $violation->save();
+            
+            // If forwarding is enabled, dispatch a job to forward the report
+            if (config('violations.forward_to')) {
+                // Dispatch a job to forward the report
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $userAgent, $ip));
+            }
+        } else {
+            // If DB storage is disabled but forwarding is enabled, still forward the report
+            if (config('violations.forward_to')) {
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $userAgent, $ip));
+            }
         }
-        // If forwarding is enabled, dispatch a job to forward the report
-        if (config('violations.forward_to')) {
-            // Dispatch a job to forward the report
-            $this->dispatch(new ForwardReport($violation));
-        }
-        ViolationEvent::dispatch($violation);
+        
+        ViolationEvent::dispatch($report, ReportSource::REPORT_URI, $userAgent, $ip);
 
         return response()->noContent();
     }
 
     public function nel(Request $request, NELReport $report): Response
     {
-        // Convert the report into a violation model
-        $violation = new Violation([
-            'report' => $report->toJson(),
-            'report_source' => ReportSource::REPORT_TO,
-            'user_agent' => (config('violations.sanitize') ? null : $request->header('User-Agent')),
-            'ip' => (config('violations.sanitize') ? null : $request->ip()),
-        ]);
-        // If DB storage is enabled, store the report in the database
+        $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
+        $ip = config('violations.sanitize') ? null : $request->ip();
+        
         if (config('violations.table')) {
-            // Store the report in the database
+            // If DB storage is enabled, store the report in the database
+            $violation = new Violation([
+                'report' => $report->toJson(),
+                'report_source' => ReportSource::REPORT_TO,
+                'user_agent' => $userAgent,
+                'ip' => $ip,
+            ]);
             $violation->save();
+            
+            // If forwarding is enabled, dispatch a job to forward the report
+            if (config('violations.forward_to')) {
+                // Dispatch a job to forward the report
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $userAgent, $ip));
+            }
+        } else {
+            // If DB storage is disabled but forwarding is enabled, still forward the report
+            if (config('violations.forward_to')) {
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $userAgent, $ip));
+            }
         }
-        // If forwarding is enabled, dispatch a job to forward the report
-        if (config('violations.forward_to')) {
-            // Dispatch a job to forward the report
-            $this->dispatch(new ForwardReport($violation));
-        }
-        ViolationEvent::dispatch($violation);
+        
+        ViolationEvent::dispatch($report, ReportSource::REPORT_TO, $userAgent, $ip);
 
         return response()->noContent();
     }
