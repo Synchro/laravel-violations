@@ -1,5 +1,7 @@
 <?php
 
+use Synchro\Violation\Enums\ReportSource;
+
 // config for Synchro/Violation
 return [
     /*
@@ -18,7 +20,9 @@ return [
      * The named endpoints to use in CSP, Reporting-Endpoints and Report-To headers
      * Each needs a name and a URL, which may or may not be an endpoint in the host app
      * The max-age value is only used in the Report-To header; it is not used in Reporting-Endpoints.
-     * The type value is used to determine which URLs to use in the CSP or NEL header; typically, you will only need one of each.
+     * The report_source value determines which reporting mechanism the endpoint supports:
+     * - 'report-uri': For the deprecated CSP2 report-uri directive (application/csp-report)
+     * - 'report-to': For the modern report-to mechanism (application/reports+json) - CSP3, NEL, etc.
      * If you change the URL prefix passed to the route macro in the service provider, you will need to update the route names here to match.
      */
     'endpoints' => [
@@ -26,13 +30,13 @@ return [
             'name' => 'csp',
             'url' => fn () => route('violations.csp'),
             'max_age' => 86400, // 1 day
-            'type' => 'csp',
+            'report_source' => ReportSource::REPORT_URI,
         ],
         [
-            'name' => 'nel',
-            'url' => fn () => route('violations.nel'),
+            'name' => 'reports',
+            'url' => fn () => route('violations.reports'),
             'max_age' => 86400, // 1 day
-            'type' => 'nel',
+            'report_source' => ReportSource::REPORT_TO,
         ],
     ],
 ];

@@ -39,7 +39,7 @@ it('fires a Violation event when a CSP report is received', function () {
     });
 });
 
-it('fires a Violation event when an NEL report is received', function () {
+it('fires a Violation event when an NEL report is received via a reports endpoint', function () {
     $this->withoutExceptionHandling();
     Event::fake();
 
@@ -50,8 +50,8 @@ it('fires a Violation event when an NEL report is received', function () {
         'user_agent' => 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0',
         'body' => [
             'referrer' => 'https://www.example.com/',
-            'protocol' => 'xyz',
-            'status-code' => 323,
+            'protocol' => 'h2',
+            'status-code' => 0,
             'elapsed-time' => 143,
             'age' => 5,
             'type' => 'http.dns.name_not_resolved',
@@ -62,7 +62,7 @@ it('fires a Violation event when an NEL report is received', function () {
 
     $response = $this->call(
         'POST',
-        '/violations/nel',
+        '/violations/reports',
         [],
         [],
         [],

@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Synchro\Violation\Http\Middleware\AddReportingHeaders;
+use Synchro\Violation\Enums\ReportSource;
 
 it('adds reporting headers when endpoints are configured', function () {
     Config::set('violations.endpoints', [
@@ -10,13 +11,13 @@ it('adds reporting headers when endpoints are configured', function () {
             'name' => 'csp',
             'url' => url('csp'),
             'max_age' => 86400, // 1 day
-            'type' => 'csp',
+            'report_source' => ReportSource::REPORT_URI,
         ],
         [
-            'name' => 'nel',
-            'url' => url('nel'),
+            'name' => 'reports',
+            'url' => url('reports'),
             'max_age' => 86400, // 1 day
-            'type' => 'nel',
+            'report_source' => ReportSource::REPORT_TO,
         ],
     ]);
 
@@ -30,14 +31,13 @@ it('adds reporting headers when endpoints are configured', function () {
     expect($response->headers->has('Reporting-Endpoints'))
         ->toBeTrue()
         ->and($response->headers->get('Reporting-Endpoints'))
-        ->toBe('csp="'.url('csp').'", nel="'.url('nel').'"')
+        ->toBe('csp="'.url('csp').'", reports="'.url('reports').'"')
         ->and($response->headers->has('Report-To'))
         ->toBeTrue()
         ->and($response->headers->get('Report-To'))
         ->toBe(
-            '[{"group":"csp","max_age":86400,"endpoints":[{"url":'
-            .json_encode(url('csp')).'}]},{"group":"nel","max_age":86400,"endpoints":[{"url":'
-            .json_encode(url('nel')).'}]}]',
+            '[{"group":"reports","max_age":86400,"endpoints":[{"url":'
+            .json_encode(url('reports')).'}]}]',
         );
 });
 

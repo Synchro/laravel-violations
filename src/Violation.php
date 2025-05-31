@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Synchro\Violation;
 
+use Synchro\Violation\Enums\ReportSource;
+
 class Violation
 {
     /**
@@ -14,19 +16,18 @@ class Violation
     public static function cspReportUri(): string
     {
         return collect(config('violations.endpoints'))
-            ->where('type', 'csp')
+            ->where('report_source', ReportSource::REPORT_URI)
             ->map(fn (array $endpoint) => is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'])
             ->implode(' ');
     }
 
     /**
-     * Get the value for the CSP report-to directive.
-     * This directive is used for CSP level 3.
+     * Get the value for the CSP3 report-to directive.
      */
     public static function cspReportTo(): string
     {
         return collect(config('violations.endpoints'))
-            ->where('type', 'csp')
+            ->where('report_source', ReportSource::REPORT_TO)
             ->pluck('name')
             ->implode(' ');
     }
@@ -49,11 +50,12 @@ class Violation
 
     /**
      * Get the value for a Report-To header.
-     * This header is used for CSP level 2 client-side reporting, but is deprecated in CSP level 3.
+     * This header is deprecated but may still be used for CSP level 3 and NEL in browsers that are not up to speed.
      */
     public static function reportToHeaderValue(): string
     {
         return collect(config('violations.endpoints'))
+            ->where('report_source', ReportSource::REPORT_TO)
             ->map(function (array $endpoint) {
                 $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
 
@@ -63,6 +65,7 @@ class Violation
                     'endpoints' => [['url' => $url]],
                 ];
             })
+            ->values()
             ->toJson();
     }
 }

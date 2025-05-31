@@ -33,14 +33,17 @@ class ViolationServiceProvider extends PackageServiceProvider
             Route::prefix($baseUrl)
                 ->withoutMiddleware(ValidateCsrfToken::class)
                 ->group(function () use ($baseUrl) {
+                    // CSP2 report-uri endpoint (application/csp-report)
                     Route::options('csp', [ViolationController::class, 'options'])
                         ->name($baseUrl.'.csp.options');
-                    Route::options('nel', [ViolationController::class, 'options'])
-                        ->name($baseUrl.'.nel.options');
                     Route::post('csp', [ViolationController::class, 'csp'])
                         ->name($baseUrl.'.csp');
-                    Route::post('nel', [ViolationController::class, 'nel'])
-                        ->name($baseUrl.'.nel');
+                    
+                    // Modern report-to endpoint (application/reports+json) for CSP3, NEL, etc.
+                    Route::options('reports', [ViolationController::class, 'options'])
+                        ->name($baseUrl.'.reports.options');
+                    Route::post('reports', [ViolationController::class, 'reports'])
+                        ->name($baseUrl.'.reports');
                 });
         });
     }
