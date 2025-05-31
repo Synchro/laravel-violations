@@ -32,7 +32,7 @@ class ViolationServiceProvider extends PackageServiceProvider
         Route::macro('violations', function (?string $baseUrl = null) {
             // Use config value as default, allow override for backward compatibility
             $baseUrl = $baseUrl ?? config('violations.route_prefix', 'violations');
-            
+
             Route::prefix($baseUrl)
                 ->withoutMiddleware(ValidateCsrfToken::class)
                 ->group(function () use ($baseUrl) {
@@ -41,7 +41,7 @@ class ViolationServiceProvider extends PackageServiceProvider
                         ->name($baseUrl.'.csp.options');
                     Route::post('csp', [ViolationController::class, 'csp'])
                         ->name($baseUrl.'.csp');
-                    
+
                     // Modern report-to endpoint (application/reports+json) for CSP3, NEL, etc.
                     Route::options('reports', [ViolationController::class, 'options'])
                         ->name($baseUrl.'.reports.options');

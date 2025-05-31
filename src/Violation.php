@@ -42,6 +42,7 @@ class Violation
             // Extract just the name and url from the endpoint list, format them as name=url
             ->map(function (array $endpoint) {
                 $url = self::resolveEndpointUrl($endpoint);
+
                 return $endpoint['name'].'="'.$url.'"';
             })
             ->implode(', ');
@@ -79,7 +80,8 @@ class Violation
     {
         if (isset($endpoint['route_suffix'])) {
             $routePrefix = config('violations.route_prefix', 'violations');
-            $routeName = $routePrefix . '.' . $endpoint['route_suffix'];
+            $routeName = $routePrefix.'.'.$endpoint['route_suffix'];
+
             return route($routeName);
         }
 

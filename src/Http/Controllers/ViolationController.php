@@ -51,15 +51,15 @@ class ViolationController extends Controller
         $report = CSP2ReportData::from($request->getContent());
 
         $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
-        $ip        = config('violations.sanitize') ? null : $request->ip();
+        $ip = config('violations.sanitize') ? null : $request->ip();
 
         if (config('violations.table')) {
             // If DB storage is enabled, store the report in the database
             $violation = new Violation([
-                'report'        => $report->toJson(),
+                'report' => $report->toJson(),
                 'report_source' => ReportSource::REPORT_URI,
-                'user_agent'    => $userAgent,
-                'ip'            => $ip,
+                'user_agent' => $userAgent,
+                'ip' => $ip,
             ]);
             $violation->save();
         }
@@ -95,7 +95,7 @@ class ViolationController extends Controller
         }
 
         $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
-        $ip        = config('violations.sanitize') ? null : $request->ip();
+        $ip = config('violations.sanitize') ? null : $request->ip();
 
         // Check if we have multiple reports or a single report
         if (self::isArrayOfReports($jsonData)) {
@@ -120,14 +120,14 @@ class ViolationController extends Controller
         // Allow any origin and allow the OPTIONS method
         // Note that GET, POST, and HEAD are always allowed, so we don't need to list them
         $headers = [
-            'Access-Control-Allow-Origin'  => '*',
+            'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'OPTIONS',
         ];
 
         // If the request includes an Access-Control-Request-Headers header,
         // extract the allowed headers and set the Access-Control-Allow-Headers header
         if ($request->hasHeader('Access-Control-Request-Headers')) {
-            if ( ! self::validateAccessControlRequestHeaders($request->header('Access-Control-Request-Headers'))) {
+            if (! self::validateAccessControlRequestHeaders($request->header('Access-Control-Request-Headers'))) {
                 return response('Invalid headers requested', 400);
             }
             // If we get here, all the requested headers are in the allowlist, so just copy the whole thing back to the response
@@ -152,7 +152,7 @@ class ViolationController extends Controller
         }, $requestedHeaders);
 
         // Check if all requested headers are in the allowed list
-        return array_all($requestedHeaders, fn(string $header) => in_array($header, self::ALLOWED_HEADERS));
+        return array_all($requestedHeaders, fn (string $header) => in_array($header, self::ALLOWED_HEADERS));
     }
 
     /**
@@ -167,10 +167,10 @@ class ViolationController extends Controller
         if (config('violations.table')) {
             // If DB storage is enabled, store the report in the database
             $violation = new Violation([
-                'report'        => $report->toJson(),
+                'report' => $report->toJson(),
                 'report_source' => ReportSource::REPORT_TO,
-                'user_agent'    => $userAgent,
-                'ip'            => $ip,
+                'user_agent' => $userAgent,
+                'ip' => $ip,
             ]);
             $violation->save();
         }
@@ -192,13 +192,13 @@ class ViolationController extends Controller
     private function getForwardingUrlForReportSource(ReportSource $reportSource): ?string
     {
         $endpoints = config('violations.endpoints', []);
-        
+
         foreach ($endpoints as $endpoint) {
             if (isset($endpoint['report_source']) && $endpoint['report_source'] === $reportSource) {
                 return $endpoint['forward_to'] ?? null;
             }
         }
-        
+
         return null;
     }
 
@@ -209,6 +209,6 @@ class ViolationController extends Controller
     private static function isArrayOfReports(array $reports): bool
     {
         // Check if the array is empty or contains only arrays
-        return ! empty($reports) && collect($reports)->every(fn(mixed $report) => is_array($report));
+        return ! empty($reports) && collect($reports)->every(fn (mixed $report) => is_array($report));
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
-use Synchro\Violation\Jobs\ForwardReport;
 use Synchro\Violation\Enums\ReportSource;
+use Synchro\Violation\Jobs\ForwardReport;
 use Synchro\Violation\Reports\CSP2ReportData;
 use Synchro\Violation\Reports\NELReport;
 

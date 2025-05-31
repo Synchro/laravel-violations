@@ -8,7 +8,7 @@ return [
      * Whether to sanitize the report (e.g. removing client IP) before forwarding it
      */
     'sanitize' => (bool) env('VIOLATIONS_SANITIZE', true),
-    
+
     /**
      * Global switch to enable/disable forwarding for all endpoints.
      * When false, no reports will be forwarded regardless of per-endpoint settings.

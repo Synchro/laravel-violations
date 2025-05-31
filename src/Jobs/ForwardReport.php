@@ -50,6 +50,6 @@ class ForwardReport implements ShouldQueue
             'Content-Type' => 'application/reports+json',
             'User-Agent' => $this->userAgent,
         ])
-        ->post($this->forwardToUrl, $this->report->toJson());
+            ->post($this->forwardToUrl, $this->report->toJson());
     }
 }
