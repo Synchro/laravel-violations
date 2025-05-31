@@ -16,7 +16,7 @@ it('can serve an OPTIONS request', function () {
 
 it('can receive a CSP report-uri report', function () {
     $this->withoutExceptionHandling();
-    $reportData =
+    $report =
         [
             'csp-report' => [
                 'blocked-uri' => 'https://evil.example.com/script.js',
@@ -31,6 +31,7 @@ it('can receive a CSP report-uri report', function () {
                 'column-number' => 1,
             ],
         ];
+    $reportData = json_encode($report);
     $response = $this->call(
         'POST',
         action([ViolationController::class, 'csp']),
@@ -39,10 +40,10 @@ it('can receive a CSP report-uri report', function () {
         [],
         [
             'CONTENT_TYPE' => 'application/csp-report',
-            'CONTENT_LENGTH' => strlen(json_encode($reportData)),
+            'CONTENT_LENGTH' => strlen($reportData),
             'HTTP_ACCEPT' => '*/*',
         ],
-        json_encode($reportData),
+        $reportData,
     );
 
     expect($response->status())

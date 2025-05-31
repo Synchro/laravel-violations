@@ -13,7 +13,7 @@ it('can create a violation model', function () {
         ->and($model->report)->toBe($violationData['report'])
         ->and($model->user_agent)->toBe($violationData['user_agent'])
         ->and($model->ip)->toBe($violationData['ip'])
-        ->and($model->report_type)->toBe($violationData['report_type'])
+        ->and($model->report_source)->toBe($violationData['report_source'])
         ->and($model->created_at)->not()->toBeNull()
         ->and($model->updated_at)->not()->toBeNull();
 });

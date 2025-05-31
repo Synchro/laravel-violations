@@ -11,7 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use JsonException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Synchro\Violation\Enums\ReportType;
+use Synchro\Violation\Enums\ReportSource;
 use Synchro\Violation\Events\Violation as ViolationEvent;
 use Synchro\Violation\Jobs\ForwardReport;
 use Synchro\Violation\Models\Violation;
@@ -52,7 +52,7 @@ class ViolationController extends Controller
         // Make a violation model instance
         $violation = new Violation([
             'report' => $report->toJson(),
-            'report_type' => ReportType::REPORT_URI,
+            'report_source' => ReportSource::REPORT_URI,
             'user_agent' => (config('violations.sanitize') ? null : $request->header('User-Agent')),
             'ip' => (config('violations.sanitize') ? null : $request->ip()),
         ]);
@@ -62,7 +62,7 @@ class ViolationController extends Controller
             $violation->save();
         }
         // If forwarding is enabled, dispatch a job to forward the report
-        if (config('violation.forward')) {
+        if (config('violations.forward_to')) {
             // Dispatch a job to forward the report
             $this->dispatch(new ForwardReport($violation));
         }
@@ -71,17 +71,22 @@ class ViolationController extends Controller
         return response()->noContent();
     }
 
-    public function nel(NELReport $report): Response
+    public function nel(Request $request, NELReport $report): Response
     {
         // Convert the report into a violation model
-        $violation = new Violation($report->toArray());
+        $violation = new Violation([
+            'report' => $report->toJson(),
+            'report_source' => ReportSource::REPORT_TO,
+            'user_agent' => (config('violations.sanitize') ? null : $request->header('User-Agent')),
+            'ip' => (config('violations.sanitize') ? null : $request->ip()),
+        ]);
         // If DB storage is enabled, store the report in the database
-        if (config('violation.store')) {
+        if (config('violations.table')) {
             // Store the report in the database
             $violation->save();
         }
         // If forwarding is enabled, dispatch a job to forward the report
-        if (config('violation.forward')) {
+        if (config('violations.forward_to')) {
             // Dispatch a job to forward the report
             $this->dispatch(new ForwardReport($violation));
         }

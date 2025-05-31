@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Synchro\Violation\Enums\CSPLevel;
-use Synchro\Violation\Enums\ReportType;
+use Synchro\Violation\Enums\ReportSource;
 
 /**
  * Declare properties.
  *
  * @property array $report
- * @property ReportType $report_type
+ * @property ReportSource $report_source
  * @property string $user_agent
  * @property string $ip
  * @property string $created_at
@@ -32,7 +32,7 @@ class Violation extends Model
      */
     protected $fillable = [
         'report',
-        'report_type',
+        'report_source',
         'user_agent',
         'ip',
         'created_at',
@@ -44,7 +44,7 @@ class Violation extends Model
      */
     protected $casts = [
         'report' => 'json',
-        'report_type' => ReportType::class,
+        'report_source' => ReportSource::class,
     ];
 
     protected function table(): string

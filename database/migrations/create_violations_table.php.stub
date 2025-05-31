@@ -12,7 +12,7 @@ return new class extends Migration {
         Schema::create(config('violations.table'), static function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('report_type', 16);
+            $table->string('report_source', 16);
             //User agent strings can contain random binary data, so need to use a blob, not text
             $table
                 ->binary('user_agent')
@@ -27,7 +27,7 @@ return new class extends Migration {
             //JSON fields are not supported in SQLite, but they will be emulated as text fields
             $table->json('report');
             //Index these two fields as we want to search for them when we look for unforwarded reports
-            $table->index(['report_type', 'forwarded']);
+            $table->index(['report_source', 'forwarded']);
         });
     }
 
