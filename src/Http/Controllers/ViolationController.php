@@ -94,32 +94,19 @@ class ViolationController extends Controller
             abort(Response::HTTP_BAD_REQUEST, 'Invalid JSON data');
         }
 
-        // Use ReportFactory to parse the report (supports CSP3, NEL, and future formats)
-        $report = ReportFactory::from($jsonData);
-
         $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
         $ip        = config('violations.sanitize') ? null : $request->ip();
 
-        if (config('violations.table')) {
-            // If DB storage is enabled, store the report in the database
-            $violation = new Violation([
-                'report'        => $report->toJson(),
-                'report_source' => ReportSource::REPORT_TO,
-                'user_agent'    => $userAgent,
-                'ip'            => $ip,
-            ]);
-            $violation->save();
-        }
-
-        // Check if forwarding is enabled and find the appropriate endpoint configuration
-        if (config('violations.forward_enabled')) {
-            $forwardTo = $this->getForwardingUrlForReportSource(ReportSource::REPORT_TO);
-            if ($forwardTo) {
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $forwardTo, $userAgent, $ip));
+        // Check if we have multiple reports or a single report
+        if (self::isArrayOfReports($jsonData)) {
+            // Handle multiple reports in a single request
+            foreach ($jsonData as $reportData) {
+                $this->processReport($reportData, $userAgent, $ip);
             }
+        } else {
+            // Handle single report
+            $this->processReport($jsonData, $userAgent, $ip);
         }
-
-        ViolationEvent::dispatch($report, ReportSource::REPORT_TO, $userAgent, $ip);
 
         return response()->noContent();
     }
@@ -166,6 +153,37 @@ class ViolationController extends Controller
 
         // Check if all requested headers are in the allowed list
         return array_all($requestedHeaders, fn(string $header) => in_array($header, self::ALLOWED_HEADERS));
+    }
+
+    /**
+     * Process a single report from the report-to endpoint.
+     * Handles storage, forwarding, and event dispatch for individual reports.
+     */
+    private function processReport(array $reportData, ?string $userAgent, ?string $ip): void
+    {
+        // Use ReportFactory to parse the report (supports CSP3, NEL, and future formats)
+        $report = ReportFactory::from($reportData);
+
+        if (config('violations.table')) {
+            // If DB storage is enabled, store the report in the database
+            $violation = new Violation([
+                'report'        => $report->toJson(),
+                'report_source' => ReportSource::REPORT_TO,
+                'user_agent'    => $userAgent,
+                'ip'            => $ip,
+            ]);
+            $violation->save();
+        }
+
+        // Check if forwarding is enabled and find the appropriate endpoint configuration
+        if (config('violations.forward_enabled')) {
+            $forwardTo = $this->getForwardingUrlForReportSource(ReportSource::REPORT_TO);
+            if ($forwardTo) {
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $forwardTo, $userAgent, $ip));
+            }
+        }
+
+        ViolationEvent::dispatch($report, ReportSource::REPORT_TO, $userAgent, $ip);
     }
 
     /**

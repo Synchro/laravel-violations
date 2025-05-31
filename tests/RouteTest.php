@@ -202,3 +202,56 @@ it('rejects invalid JSON for a reports endpoint', function () {
 
     expect($response->status())->toBe(400);
 });
+
+it('can receive multiple reports in a single request', function () {
+    $this->withoutExceptionHandling();
+    $reports = [
+        [
+            'type' => 'network-error',
+            'age' => 29,
+            'url' => 'https://example.com/script.js',
+            'user_agent' => 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0',
+            'body' => [
+                'referrer' => 'https://www.example.com/',
+                'protocol' => 'h2',
+                'status-code' => 0,
+                'elapsed-time' => 143,
+                'age' => 5,
+                'type' => 'http.dns.name_not_resolved',
+            ],
+        ],
+        [
+            'type' => 'csp-violation',
+            'age' => 10,
+            'url' => 'https://example.com/page.html',
+            'user_agent' => 'Mozilla/5.0',
+            'body' => [
+                'blockedURL' => 'https://evil.example.com/script.js',
+                'documentURL' => 'https://example.com/page.html',
+                'effectiveDirective' => 'script-src',
+                'originalPolicy' => "default-src 'none'; script-src 'self'",
+                'violatedDirective' => 'script-src',
+                'disposition' => 'enforce',
+            ],
+        ],
+    ];
+    $reportData = json_encode($reports);
+    $response = $this->call(
+        'POST',
+        action([ViolationController::class, 'reports']),
+        [],
+        [],
+        [],
+        [
+            'CONTENT_TYPE' => 'application/reports+json',
+            'CONTENT_LENGTH' => strlen($reportData),
+            'HTTP_ACCEPT' => '*/*',
+        ],
+        $reportData,
+    );
+
+    expect($response->status())
+        ->toBe(204)
+        ->and($response->content())
+        ->toBeEmpty();
+});
