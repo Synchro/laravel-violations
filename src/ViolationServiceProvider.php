@@ -29,7 +29,10 @@ class ViolationServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        Route::macro('violations', function (string $baseUrl = 'violations') {
+        Route::macro('violations', function (?string $baseUrl = null) {
+            // Use config value as default, allow override for backward compatibility
+            $baseUrl = $baseUrl ?? config('violations.route_prefix', 'violations');
+            
             Route::prefix($baseUrl)
                 ->withoutMiddleware(ValidateCsrfToken::class)
                 ->group(function () use ($baseUrl) {

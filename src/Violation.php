@@ -17,7 +17,7 @@ class Violation
     {
         return collect(config('violations.endpoints'))
             ->where('report_source', ReportSource::REPORT_URI)
-            ->map(fn (array $endpoint) => is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'])
+            ->map(fn (array $endpoint) => self::resolveEndpointUrl($endpoint))
             ->implode(' ');
     }
 
@@ -41,8 +41,7 @@ class Violation
         return collect(config('violations.endpoints'))
             // Extract just the name and url from the endpoint list, format them as name=url
             ->map(function (array $endpoint) {
-                $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
-
+                $url = self::resolveEndpointUrl($endpoint);
                 return $endpoint['name'].'="'.$url.'"';
             })
             ->implode(', ');
@@ -57,7 +56,7 @@ class Violation
         return collect(config('violations.endpoints'))
             ->where('report_source', ReportSource::REPORT_TO)
             ->map(function (array $endpoint) {
-                $url = is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
+                $url = self::resolveEndpointUrl($endpoint);
 
                 return [
                     'group' => $endpoint['name'],
@@ -67,5 +66,31 @@ class Violation
             })
             ->values()
             ->toJson();
+    }
+
+    /**
+     * Resolve an endpoint URL from configuration.
+     * Supports multiple formats for backward compatibility:
+     * - 'route_suffix': Combined with route_prefix to build route name (preferred for dynamic prefix support)
+     * - 'route': Direct route name (for backward compatibility)
+     * - 'url': Callable or string URL (for backward compatibility)
+     */
+    private static function resolveEndpointUrl(array $endpoint): string
+    {
+        if (isset($endpoint['route_suffix'])) {
+            $routePrefix = config('violations.route_prefix', 'violations');
+            $routeName = $routePrefix . '.' . $endpoint['route_suffix'];
+            return route($routeName);
+        }
+
+        if (isset($endpoint['route'])) {
+            return route($endpoint['route']);
+        }
+
+        if (isset($endpoint['url'])) {
+            return is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
+        }
+
+        throw new \InvalidArgumentException('Endpoint must have either "route_suffix", "route", or "url" key');
     }
 }
