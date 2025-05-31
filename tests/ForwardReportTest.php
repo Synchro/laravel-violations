@@ -10,7 +10,6 @@ use Synchro\Violation\Reports\CSP2ReportData;
 use Synchro\Violation\Reports\NELReport;
 
 beforeEach(function () {
-    config(['violations.forward_to' => 'https://example.com/reports']);
     config(['violations.table' => 'violations']);
     Http::fake();
     Queue::fake();
@@ -23,6 +22,7 @@ it('forwards CSP report correctly', function () {
     $job = new ForwardReport(
         report: $report,
         reportSource: ReportSource::REPORT_URI,
+        forwardToUrl: 'https://example.com/reports',
         userAgent: 'Mozilla/5.0 (Test Browser)',
         ip: '192.168.1.1'
     );
@@ -38,6 +38,7 @@ it('forwards NEL report correctly', function () {
     $job = new ForwardReport(
         report: $report,
         reportSource: ReportSource::REPORT_TO,
+        forwardToUrl: 'https://example.com/reports',
         userAgent: 'Mozilla/5.0 (Test Browser)',
         ip: '2001:db8::1'
     );
@@ -57,6 +58,7 @@ it('handles null user agent', function () {
     $job = new ForwardReport(
         report: $report,
         reportSource: ReportSource::REPORT_URI,
+        forwardToUrl: 'https://example.com/reports',
         userAgent: null,
         ip: '192.168.1.1'
     );
@@ -74,6 +76,7 @@ it('works without database storage', function () {
     $job = new ForwardReport(
         report: $report,
         reportSource: ReportSource::REPORT_URI,
+        forwardToUrl: 'https://example.com/reports',
         userAgent: 'Mozilla/5.0 (Test Browser)',
         ip: '192.168.1.1'
     );
@@ -82,19 +85,20 @@ it('works without database storage', function () {
     Http::assertSentCount(1);
 });
 
-it('does not forward when disabled', function () {
-    config(['violations.forward_to' => null]);
-
+it('forwards to specified URL', function () {
     $originalJson = '{"csp-report":{"document-uri":"http://example.org/"}}';
     $report = CSP2ReportData::from($originalJson);
 
     $job = new ForwardReport(
         report: $report,
         reportSource: ReportSource::REPORT_URI,
+        forwardToUrl: 'https://custom.example.com/endpoint',
         userAgent: 'Mozilla/5.0 (Test Browser)',
         ip: '192.168.1.1'
     );
     $job->handle();
 
-    Http::assertNothingSent();
+    Http::assertSent(function ($request) {
+        return $request->url() === 'https://custom.example.com/endpoint';
+    });
 });

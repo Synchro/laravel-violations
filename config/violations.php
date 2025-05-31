@@ -4,14 +4,16 @@ use Synchro\Violation\Enums\ReportSource;
 
 // config for Synchro/Violation
 return [
-    /*
-     * An optional URL to forward the report to, e.g. https://<project>.report-uri.com
-     */
-    'forward_to' => env('VIOLATIONS_ENDPOINT', null),
     /**
      * Whether to sanitize the report (e.g. removing client IP) before forwarding it
      */
     'sanitize' => (bool) env('VIOLATIONS_SANITIZE', true),
+    
+    /**
+     * Global switch to enable/disable forwarding for all endpoints.
+     * When false, no reports will be forwarded regardless of per-endpoint settings.
+     */
+    'forward_enabled' => (bool) env('VIOLATIONS_FORWARD_ENABLED', true),
     /**
      * The name of the table to store reports in, if null, nothing is stored
      */
@@ -38,8 +40,9 @@ return [
      * Each needs a name and the route suffix (will be combined with route_prefix above).
      * The max-age value is only used in the Report-To header; it is not used in Reporting-Endpoints.
      * The report_source value determines which reporting mechanism the endpoint supports:
-     * - ReportSource::REPORT_URI: For the deprecated CSP2 report-uri directive (application/csp-report)
-     * - ReportSource::REPORT_TO: For the modern report-to mechanism (application/reports+json) - CSP3, NEL, etc.
+     * - ReportSource::REPORT_URI: For CSP2 report-uri directive (application/csp-report)
+     * - ReportSource::REPORT_TO: For modern report-to mechanism (application/reports+json) - CSP3, NEL, etc.
+     * The forward_to value is an optional URL to forward reports to for this specific endpoint.
      */
     'endpoints' => [
         [
@@ -47,12 +50,14 @@ return [
             'route_suffix' => 'csp',
             'max_age' => 86400, // 1 day
             'report_source' => ReportSource::REPORT_URI,
+            'forward_to' => env('VIOLATIONS_CSP_FORWARD_TO', null),
         ],
         [
             'name' => 'reports',
             'route_suffix' => 'reports',
             'max_age' => 86400, // 1 day
             'report_source' => ReportSource::REPORT_TO,
+            'forward_to' => env('VIOLATIONS_REPORTS_FORWARD_TO', null),
         ],
     ],
 ];

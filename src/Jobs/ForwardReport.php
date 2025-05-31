@@ -36,6 +36,7 @@ class ForwardReport implements ShouldQueue
     public function __construct(
         private readonly Data $report,
         private readonly ReportSource $reportSource,
+        private readonly string $forwardToUrl,
         private readonly ?string $userAgent = null,
         private readonly ?string $ip = null,
     ) {
@@ -44,16 +45,11 @@ class ForwardReport implements ShouldQueue
 
     public function handle(): void
     {
-        // Forward the report to our configured forward_to endpoint
-        $forwardTo = config('violations.forward_to');
-        
-        if ($forwardTo) {
-            // Forward the report as JSON
-            Http::withHeaders([
-                'Content-Type' => 'application/reports+json',
-                'User-Agent' => $this->userAgent,
-            ])
-            ->post($forwardTo, $this->report->toJson());
-        }
+        // Forward the report to the specified URL
+        Http::withHeaders([
+            'Content-Type' => 'application/reports+json',
+            'User-Agent' => $this->userAgent,
+        ])
+        ->post($this->forwardToUrl, $this->report->toJson());
     }
 }

@@ -62,16 +62,13 @@ class ViolationController extends Controller
                 'ip'            => $ip,
             ]);
             $violation->save();
+        }
 
-            // If forwarding is enabled, dispatch a job to forward the report
-            if (config('violations.forward_to')) {
-                // Dispatch a job to forward the report
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $userAgent, $ip));
-            }
-        } else {
-            // If DB storage is disabled but forwarding is enabled, still forward the report
-            if (config('violations.forward_to')) {
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $userAgent, $ip));
+        // Check if forwarding is enabled and find the appropriate endpoint configuration
+        if (config('violations.forward_enabled')) {
+            $forwardTo = $this->getForwardingUrlForReportSource(ReportSource::REPORT_URI);
+            if ($forwardTo) {
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $forwardTo, $userAgent, $ip));
             }
         }
 
@@ -112,16 +109,13 @@ class ViolationController extends Controller
                 'ip'            => $ip,
             ]);
             $violation->save();
+        }
 
-            // If forwarding is enabled, dispatch a job to forward the report
-            if (config('violations.forward_to')) {
-                // Dispatch a job to forward the report
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $userAgent, $ip));
-            }
-        } else {
-            // If DB storage is disabled but forwarding is enabled, still forward the report
-            if (config('violations.forward_to')) {
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $userAgent, $ip));
+        // Check if forwarding is enabled and find the appropriate endpoint configuration
+        if (config('violations.forward_enabled')) {
+            $forwardTo = $this->getForwardingUrlForReportSource(ReportSource::REPORT_TO);
+            if ($forwardTo) {
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $forwardTo, $userAgent, $ip));
             }
         }
 
@@ -172,6 +166,22 @@ class ViolationController extends Controller
 
         // Check if all requested headers are in the allowed list
         return array_all($requestedHeaders, fn(string $header) => in_array($header, self::ALLOWED_HEADERS));
+    }
+
+    /**
+     * Get the forwarding URL for a specific report source from the endpoint configuration.
+     */
+    private function getForwardingUrlForReportSource(ReportSource $reportSource): ?string
+    {
+        $endpoints = config('violations.endpoints', []);
+        
+        foreach ($endpoints as $endpoint) {
+            if (isset($endpoint['report_source']) && $endpoint['report_source'] === $reportSource) {
+                return $endpoint['forward_to'] ?? null;
+            }
+        }
+        
+        return null;
     }
 
     /**
