@@ -32,10 +32,10 @@ it('fires a Violation event when a CSP report is received', function () {
         $reportData
     );
 
-    $response->assertStatus(204);
+    $response->assertNoContent();
 
     Event::assertDispatched(ViolationEvent::class, function ($event) {
-        return $event->violation !== null;
+        return $event->report !== null && $event->reportSource !== null;
     });
 });
 
@@ -73,10 +73,10 @@ it('fires a Violation event when an NEL report is received', function () {
         $reportData
     );
 
-    $response->assertStatus(204);
+    $response->assertNoContent();
 
     Event::assertDispatched(ViolationEvent::class, function ($event) {
-        return $event->violation !== null;
+        return $event->report !== null && $event->reportSource !== null;
     });
 });
 
@@ -107,16 +107,13 @@ it('passes the correct violation data in the event', function () {
         $reportData
     );
 
-    $response->assertStatus(204);
+    $response->assertNoContent();
     Event::assertDispatched(ViolationEvent::class);
 
     // Also verify the event contains the expected data
     Event::assertDispatched(ViolationEvent::class, function ($event) {
-        $violation = $event->violation;
-        $reportData = json_decode($violation->report, true);
-
-        return $violation->report_source->value === 'report-uri' &&
-               $reportData['cspReport']['documentURI'] === 'http://example.org/page.html' &&
-               $reportData['cspReport']['blockedURI'] === 'http://evil.example.com/image.png';
+        return $event->reportSource->value === 'report-uri' &&
+               $event->report->cspReport->documentURI === 'http://example.org/page.html' &&
+               $event->report->cspReport->blockedURI === 'http://evil.example.com/image.png';
     });
 });

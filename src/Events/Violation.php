@@ -7,7 +7,8 @@ namespace Synchro\Violation\Events;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Synchro\Violation\Models\Violation as ViolationModel;
+use Spatie\LaravelData\Data;
+use Synchro\Violation\Enums\ReportSource;
 
 class Violation
 {
@@ -16,6 +17,9 @@ class Violation
     use SerializesModels;
 
     public function __construct(
-        public ViolationModel $violation,
+        public Data $report,
+        public ReportSource $reportSource,
+        public ?string $userAgent = null,
+        public ?string $ip = null,
     ) {}
 }
