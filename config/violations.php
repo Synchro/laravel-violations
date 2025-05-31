@@ -40,8 +40,8 @@ return [
      * Each needs a name and the route suffix (will be combined with route_prefix above).
      * The max-age value is only used in the Report-To header; it is not used in Reporting-Endpoints.
      * The report_source value determines which reporting mechanism the endpoint supports:
-     * - ReportSource::REPORT_URI: For CSP2 report-uri directive (application/csp-report)
-     * - ReportSource::REPORT_TO: For modern report-to mechanism (application/reports+json) - CSP3, NEL, etc.
+     * - ReportSource::REPORT_URI: For the deprecated CSP2 report-uri directive (application/csp-report)
+     * - ReportSource::REPORT_TO: For the modern report-to mechanism (application/reports+json) - CSP3, NEL, etc.
      * The forward_to value is an optional URL to forward reports to for this specific endpoint.
      */
     'endpoints' => [
