@@ -83,7 +83,7 @@ You can also add it to specific routes or route groups if you only want it to ap
 This package does not generate your `Content-Security-Policy` header for you, but you can create one manually or using Spatie's [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp) package.
 
 ### Building your own CSP
-You can set a CSP header manually on responses, and use this package to generate the correct value for the directives you need. For example, to set the `report-to` directive, you can do something like this in your controller or middleware:
+You can set a CSP header manually on responses and use this package to generate the correct value for the directives you need. For example, to set the `report-to` directive, you can do something like this in your controller or middleware:
 
 ```php
 return response($content)
@@ -91,15 +91,15 @@ return response($content)
 ```
 
 ### Using `spatie/laravel-csp`
-[Spatie's CSP package for Laravel](https://github.com/spatie/laravel-csp) helps you build complex CSP headers using a nice fluent interface. While it supports the `report-uri` and `report-to` directives, it doesn't actually create their values; That's where this package comes in.
-In Spatie's CSP config fie in `config/csp.php`, set the `report-to` and `report-uri` CSP directives to retrieve correctly formatted reporting endpoints that you defined in this package's config, using the helper functions, for example:
+[Spatie's CSP package for Laravel](https://github.com/spatie/laravel-csp) helps you build complex CSP headers using a nice fluent interface. While it supports the `report-uri` and `report-to` directives, you are expected to populate their values yourself; That's where this package comes in.
+In Spatie's CSP config file in `config/csp.php`, set the `report-to` and `report-uri` CSP directives to retrieve correctly formatted reporting endpoints that you defined in this package's config, using the helper functions, for example:
 
 ```php
 'report-uri' => \Synchro\Violation\Violation::cspReportUri(),
 'report-to' => \Synchro\Violation\Violation::cspReportTo(),
 ```
 
-There is also a `Spatie\Csp\Preset` class ready to use in `\Synchro\Violation\Support\AddReportingEndpointsPreset` which you can add to your CSP config to have it define the reporting directives for you.
+There is also a `Spatie\Csp\Preset` class ready to use in `\Synchro\Violation\Support\AddReportingEndpointsPreset` which you can add to your Spatie CSP config to have it define the reporting directives for you.
 
 ## Network Error Logging (NEL)
 This class also handles [Network Error Logging](https://www.w3.org/TR/network-error-logging/) reports. These are sent when a client-side network error occurs, such as a DNS lookup failure, TCP or TLS handshake failure (e.g. your CDN's certificate expired), or application-level HTTP events like forwarding loops or user aborts.
@@ -124,9 +124,9 @@ Browsers will often send a preflight `OPTIONS` request to the reporting endpoint
 
 When a report is received, it is parsed into a matching Data Transfer Object (DTO) built using Spatie's excellent [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) package.
 
-Be aware that the reporting mechanisms are deliberately designed to be use "out of band" so that their traffic does not interfere with the performance of your site; the browser will accumulate reports and send them in batches after a delay, so you may receive multiple reports (possibly of multiple types) in a single request. The package will handle this for you and will parse each report individually, send events, store models, etc.
+Be aware that the reporting mechanisms are deliberately designed to work "out of band" so that their traffic does not interfere with the performance of your site; the browser will accumulate reports and send them in batches after a delay, so you may receive multiple reports (possibly of multiple types) in a single request. The package will handle this for you and will parse each report individually, send events, store models, etc.
 
-You can monitor report sending in Chrome in its dev tools under the "Application" tab, then under the "Reporting API" section.
+You can monitor the sending of reports in Chrome in its dev tools under the "Application" tab, then under the "Reporting API" section.
 
 ### Trustworthy endpoints
 Testing report sending can be tricky because browsers are very picky about the circumstances under which they send reports. In particular, they will only send reports to TLS endpoints that conform to [a definition of "potentially trustworthy"](https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy), which may interfere with development practices, for example, it won't send reports to endpoints with self-signed certificates.
@@ -147,11 +147,11 @@ The package configures a kernel task to retry forwarding failed reports every ho
 
 ## Privacy concerns
 
-While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service. Because reports are sent directly from the client's browser to the reporting service, it reveals the fact that someone is visiting your site, their IP, and their user-agent string, to the third-party site. Such leakage is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason.
+While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service. Because reports are sent directly from the client's browser to the reporting service, it reveals the fact that someone is visiting your site, their IP, and their user-agent string, to the third-party site. Data leakage like this is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason.
 
 When forwarding/proxying reports through this package to a reporting service, all reports will appear to originate from your server's IP addresses, not your clients' browsers. This means that things like geoIP country mapping will no longer be useful. It does, however, preserve user-agent strings, letting you spot issues relating to specific browser platforms and versions.
 
-Another reason to proxy client-side reports is if your site is on a private network that has no external internet access. In that case you need to store the reports locally, or forward them via a proxy service (such as this package provides), or you won't see the reports at all.
+Another reason to proxy client-side reports is if your site is on a private network that has no external internet access. In that case you need to store the reports locally or forward them via a proxy service (such as this package provides), or you won't see the reports at all.
 
 ## Testing
 
@@ -163,14 +163,6 @@ composer test
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](SECURITY.md) on how to report security vulnerabilities.
 
 ## Support open source development
 
