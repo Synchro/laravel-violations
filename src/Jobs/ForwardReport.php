@@ -7,6 +7,7 @@ namespace Synchro\Violation\Jobs;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
@@ -43,13 +44,20 @@ class ForwardReport implements ShouldQueue
         //
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function handle(): void
     {
         // Forward the report to the specified URL
         Http::withHeaders([
-            'Content-Type' => 'application/reports+json',
-            'User-Agent' => $this->userAgent,
-        ])
-            ->post($this->forwardToUrl, $this->report->toJson());
+            'User-Agent' => ($this->userAgent ?? 'Laravel Violation Reporter'),
+            'X-Forwarded-For' => (!config('violations.sanitize') && $this->ip ? $this->ip : ''),
+        ])->withBody(
+            $this->report->toJson(),
+            $this->reportSource === ReportSource::REPORT_URI ? 'application/csp-report' :
+            'application/reports+json'
+        )
+            ->post($this->forwardToUrl,);
     }
 }
