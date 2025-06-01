@@ -20,16 +20,18 @@ class QueueViolations extends Command
 
     public function handle(): int
     {
-        if (!config('violations.forward_enabled')) {
+        if (! config('violations.forward_enabled')) {
             $this->error(__('Violation forwarding is globally disabled; ignoring.'));
+
             return self::FAILURE;
         }
 
         $endpoints = config('violations.endpoints', []);
-        $forwardingEndpoints = collect($endpoints)->filter(fn(array $endpoint) => !empty($endpoint['forward_to']))->toArray();
+        $forwardingEndpoints = collect($endpoints)->filter(fn (array $endpoint) => ! empty($endpoint['forward_to']))->toArray();
 
         if (empty($forwardingEndpoints)) {
             $this->error(__('No forwarding endpoints configured; ignoring.'));
+
             return self::FAILURE;
         }
 
@@ -37,6 +39,7 @@ class QueueViolations extends Command
         $violations = Violation::unforwarded()->get();
         if ($violations->isEmpty()) {
             $this->info(__('No violations to forward.'));
+
             return self::SUCCESS;
         }
 
@@ -91,7 +94,7 @@ class QueueViolations extends Command
     /**
      * Convert a stored JSON report back to its appropriate DTO.
      */
-    private function parseReportToDto(Violation $violation): Data|null
+    private function parseReportToDto(Violation $violation): ?Data
     {
         try {
             if ($violation->report_source === ReportSource::REPORT_URI) {
@@ -102,10 +105,11 @@ class QueueViolations extends Command
                 return ReportFactory::from($violation->report);
             }
         } catch (\Exception $e) {
-            $this->error(__("Failed to parse report for violation ID :id: :error", [
+            $this->error(__('Failed to parse report for violation ID :id: :error', [
                 'id' => $violation->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]));
+
             return null;
         }
     }

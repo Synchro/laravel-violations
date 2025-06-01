@@ -61,7 +61,7 @@ class Violation extends Model
     {
         $maxAttempts = config('violations.max_forward_attempts', 3);
         $query->where('forwarded', false)
-              ->where('forward_attempts', '<', $maxAttempts);
+            ->where('forward_attempts', '<', $maxAttempts);
     }
 
     /**
