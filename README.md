@@ -13,7 +13,7 @@ These headers make use of the `report-to` directive from CSP level 3, which targ
 
 Aside from CSP2's `report-uri` directive, the URLs themselves are defined in a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to. The `Report-To` header provides similar information, but is both deprecated and not widely supported.
 
-This package can store the reports in the database and/or forward them to a report aggregation service, such as [report-uri.com](https://report-uri.com), allowing you to manage the enormous volumes of reports that are often generated, without impacting the privacy of your users. Each report type has a DTO class that you can use to parse the report content.
+This package can store the reports in the database and/or forward them to a report aggregation service, such as [report-uri.com](https://report-uri.com), allowing you to manage the enormous volumes of reports that are often generated without impacting the privacy of your users. Each report type has a DTO class that you can use to parse the report content.
 
 It also generates events that you can listen for to take further action on the reports, such as logging or alerting.
 
