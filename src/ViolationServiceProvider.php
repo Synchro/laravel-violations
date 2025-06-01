@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Synchro\Violation;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
@@ -48,6 +49,21 @@ class ViolationServiceProvider extends PackageServiceProvider
                     Route::post('reports', [ViolationController::class, 'reports'])
                         ->name($baseUrl.'.reports');
                 });
+        });
+    }
+
+    public function packageBooted(): void
+    {
+        // Register a scheduled task to queue unforwarded violations for forwarding
+        $this->app->afterResolving(Schedule::class, function (Schedule $schedule) {
+            // Only schedule the task if database storage is enabled
+            if (config('violations.table')) {
+                $schedule->command('violations:queue')
+                    ->hourly()
+                    ->name('queue-violations')
+                    ->withoutOverlapping()
+                    ->runInBackground();
+            }
         });
     }
 }
