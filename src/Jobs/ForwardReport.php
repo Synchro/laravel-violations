@@ -52,12 +52,12 @@ class ForwardReport implements ShouldQueue
         // Forward the report to the specified URL
         Http::withHeaders([
             'User-Agent' => ($this->userAgent ?? 'Laravel Violation Reporter'),
-            'X-Forwarded-For' => (!config('violations.sanitize') && $this->ip ? $this->ip : ''),
+            'X-Forwarded-For' => (! config('violations.sanitize') && $this->ip ? $this->ip : ''),
         ])->withBody(
             $this->report->toJson(),
             $this->reportSource === ReportSource::REPORT_URI ? 'application/csp-report' :
             'application/reports+json'
         )
-            ->post($this->forwardToUrl,);
+            ->post($this->forwardToUrl);
     }
 }
