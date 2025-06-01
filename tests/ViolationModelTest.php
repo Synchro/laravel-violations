@@ -14,6 +14,8 @@ it('can create a violation model', function () {
         ->and($model->user_agent)->toBe($violationData['user_agent'])
         ->and($model->ip)->toBe($violationData['ip'])
         ->and($model->report_source)->toBe($violationData['report_source'])
+        ->and($model->forwarded)->toBe($violationData['forwarded'])
+        ->and($model->forward_attempts)->toBe($violationData['forward_attempts'])
         ->and($model->created_at)->not()->toBeNull()
         ->and($model->updated_at)->not()->toBeNull();
 });

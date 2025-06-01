@@ -22,6 +22,8 @@ class ViolationFactory extends Factory
             'report_source' => ReportSource::REPORT_TO,
             'user_agent' => $this->faker->userAgent(),
             'ip' => $this->faker->ipv4(),
+            'forwarded' => false,
+            'forward_attempts' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ];
