@@ -24,5 +24,8 @@ jobs:
       - name: Install composer dependencies
         uses: ramsey/composer-install@v3
 
+      - name: Run pest in type coverage mode
+        run: ./vendor/bin/pest --type-coverage --min=100
+
       - name: Run PHPStan
         run: ./vendor/bin/phpstan --error-format=github
