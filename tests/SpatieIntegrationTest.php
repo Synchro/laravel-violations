@@ -9,9 +9,9 @@ use Synchro\Violation\Violation;
 
 it('adds the CSP report-uri and report-to clauses to the policy directly', function () {
     $policy = new Policy;
-
     $policy->add(Directive::REPORT, Violation::cspReportUri());
     $policy->add(Directive::REPORT_TO, Violation::cspReportTo());
+
     expect($policy->getContents())
         ->toBeString()
         ->toContain('report-uri '.Violation::cspReportUri())
@@ -49,6 +49,7 @@ it('injects a report-uri directive into a Spatie CSP header using a preset', fun
     $response = $middleware->handle($request, function ($request) {
         return response('', 200);
     });
+
     expect($response->headers->has('Content-Security-Policy'))
         ->toBeTrue()
         ->and($response->headers->get('Content-Security-Policy'))

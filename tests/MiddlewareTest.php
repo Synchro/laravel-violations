@@ -78,15 +78,15 @@ it('route macro uses config prefix by default', function () {
         return $baseUrl ?? config('violations.route_prefix', 'violations');
     };
 
-    // Test without parameter (should use config)
+    // Test without a parameter (should use config)
     $result1 = $testMacro();
     expect($result1)->toBe('custom-security');
 
-    // Test with parameter (should use parameter)
+    // Test with a parameter (should use parameter)
     $result2 = $testMacro('override-prefix');
     expect($result2)->toBe('override-prefix');
 
-    // Test with null parameter (should use config)
+    // Test with a null parameter (should use config)
     $result3 = $testMacro(null);
     expect($result3)->toBe('custom-security');
 });

@@ -15,7 +15,7 @@ beforeEach(function () {
     Queue::fake();
 });
 
-it('forwards CSP report correctly', function () {
+it('forwards a CSP report correctly', function () {
     $originalJson = '{"csp-report":{"document-uri":"http://example.org/page.html","blocked-uri":"http://evil.example.com/image.png","violated-directive":"default-src \'self\'"}}';
     $report = CSP2ReportData::from($originalJson);
 
@@ -31,7 +31,7 @@ it('forwards CSP report correctly', function () {
     Http::assertSentCount(1);
 });
 
-it('forwards NEL report correctly', function () {
+it('forwards an NEL report correctly', function () {
     $originalJson = '{"type":"network-error","age":29,"url":"https://example.com/thing.js","user_agent":"Mozilla/5.0","body":{"type":"http.dns.name_not_resolved","referrer":"https://example.com/"}}';
     $report = NELReport::from($originalJson);
 
@@ -51,7 +51,7 @@ it('forwards NEL report correctly', function () {
     });
 });
 
-it('handles null user agent', function () {
+it('handles a null user agent', function () {
     $originalJson = '{"csp-report":{"document-uri":"http://example.org/"}}';
     $report = CSP2ReportData::from($originalJson);
 
@@ -85,7 +85,7 @@ it('works without database storage', function () {
     Http::assertSentCount(1);
 });
 
-it('forwards to specified URL', function () {
+it('forwards to a specified URL', function () {
     $originalJson = '{"csp-report":{"document-uri":"http://example.org/"}}';
     $report = CSP2ReportData::from($originalJson);
 

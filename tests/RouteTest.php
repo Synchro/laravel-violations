@@ -3,7 +3,7 @@
 use Symfony\Component\HttpFoundation\Response;
 use Synchro\Violation\Http\Controllers\ViolationController;
 
-it('can serve an OPTIONS request for a CSP endpoint', function () {
+it('can serve an OPTIONS request for a CSP2 endpoint', function () {
     $this->withoutExceptionHandling();
     $response = $this->call('OPTIONS', action([ViolationController::class, 'csp']));
     expect($response->status())
@@ -14,7 +14,7 @@ it('can serve an OPTIONS request for a CSP endpoint', function () {
         ->toBe('*');
 });
 
-it('can serve an OPTIONS request for reports endpoint', function () {
+it('can serve an OPTIONS request for a reports endpoint', function () {
     $this->withoutExceptionHandling();
     $response = $this->call('OPTIONS', action([ViolationController::class, 'reports']));
     expect($response->status())
@@ -93,7 +93,7 @@ it('rejects prohibited HTTP verbs', function () {
     expect($response->status())->toBe(Response::HTTP_METHOD_NOT_ALLOWED);
 });
 
-it('can receive a NEL report via a reports endpoint', function () {
+it('can receive an NEL report via a reports endpoint', function () {
     $this->withoutExceptionHandling();
     $report = [
         'type' => 'network-error',
