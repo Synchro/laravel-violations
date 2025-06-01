@@ -53,6 +53,7 @@ class ViolationController extends Controller
         $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
         $ip = config('violations.sanitize') ? null : $request->ip();
 
+        $violationId = null;
         if (config('violations.table')) {
             // If DB storage is enabled, store the report in the database
             $violation = new Violation([
@@ -62,13 +63,14 @@ class ViolationController extends Controller
                 'ip' => $ip,
             ]);
             $violation->save();
+            $violationId = $violation->id;
         }
 
         // Check if forwarding is enabled and find the appropriate endpoint configuration
         if (config('violations.forward_enabled')) {
             $forwardTo = $this->getForwardingUrlForReportSource(ReportSource::REPORT_URI);
             if ($forwardTo) {
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $forwardTo, $userAgent, $ip));
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_URI, $forwardTo, $userAgent, $ip, $violationId));
             }
         }
 
@@ -164,6 +166,7 @@ class ViolationController extends Controller
         // Use ReportFactory to parse the report (supports CSP3, NEL, and future formats)
         $report = ReportFactory::from($reportData);
 
+        $violationId = null;
         if (config('violations.table')) {
             // If DB storage is enabled, store the report in the database
             $violation = new Violation([
@@ -173,13 +176,14 @@ class ViolationController extends Controller
                 'ip' => $ip,
             ]);
             $violation->save();
+            $violationId = $violation->id;
         }
 
         // Check if forwarding is enabled and find the appropriate endpoint configuration
         if (config('violations.forward_enabled')) {
             $forwardTo = $this->getForwardingUrlForReportSource(ReportSource::REPORT_TO);
             if ($forwardTo) {
-                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $forwardTo, $userAgent, $ip));
+                $this->dispatch(new ForwardReport($report, ReportSource::REPORT_TO, $forwardTo, $userAgent, $ip, $violationId));
             }
         }
 

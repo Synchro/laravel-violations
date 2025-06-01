@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\ReportSource;
+use Synchro\Violation\Models\Violation;
 
 class ForwardReport implements ShouldQueue
 {
@@ -40,6 +41,7 @@ class ForwardReport implements ShouldQueue
         private readonly string $forwardToUrl,
         private readonly ?string $userAgent = null,
         private readonly ?string $ip = null,
+        private readonly ?int $violationId = null,
     ) {
         //
     }
@@ -49,8 +51,13 @@ class ForwardReport implements ShouldQueue
      */
     public function handle(): void
     {
+        // Increment forward attempts before making the request
+        if ($this->violationId && config('violations.table')) {
+            Violation::where('id', $this->violationId)->increment('forward_attempts');
+        }
+
         // Forward the report to the specified URL
-        Http::withHeaders([
+        $response = Http::withHeaders([
             'User-Agent' => ($this->userAgent ?? 'Laravel Violation Reporter'),
             'X-Forwarded-For' => (! config('violations.sanitize') && $this->ip ? $this->ip : ''),
         ])->withBody(
@@ -59,5 +66,10 @@ class ForwardReport implements ShouldQueue
             'application/reports+json'
         )
             ->post($this->forwardToUrl);
+
+        // Only mark as forwarded if the request was successful and we have a violation ID
+        if ($response->successful() && $this->violationId && config('violations.table')) {
+            Violation::where('id', $this->violationId)->update(['forwarded' => true]);
+        }
     }
 }

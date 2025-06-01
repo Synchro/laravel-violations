@@ -19,6 +19,7 @@ use Synchro\Violation\Enums\ReportSource;
  * @property string $user_agent
  * @property string $ip
  * @property bool $forwarded
+ * @property int $forward_attempts
  * @property string $created_at
  * @property string $updated_at
  */
@@ -37,6 +38,7 @@ class Violation extends Model
         'user_agent',
         'ip',
         'forwarded',
+        'forward_attempts',
         'created_at',
         'updated_at',
     ];
@@ -55,9 +57,11 @@ class Violation extends Model
     }
 
     #[Scope]
-    public function unforwarded(Builder $query): void
+    protected function unforwarded(Builder $query): void
     {
-        $query->where('forwarded', false);
+        $maxAttempts = config('violations.max_forward_attempts', 3);
+        $query->where('forwarded', false)
+              ->where('forward_attempts', '<', $maxAttempts);
     }
 
     /**

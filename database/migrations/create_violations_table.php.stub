@@ -23,11 +23,14 @@ return new class extends Migration {
             $table
                 ->boolean('forwarded')
                 ->default(false);
+            $table
+                ->unsignedTinyInteger('forward_attempts')
+                ->default(0);
             //The entire raw report received from the client is stored in here
             //JSON fields are not supported in SQLite, but they will be emulated as text fields
             $table->json('report');
-            //Index these two fields as we want to search for them when we look for unforwarded reports
-            $table->index(['report_source', 'forwarded']);
+            //Index these fields as we want to search for them when we look for unforwarded reports
+            $table->index(['report_source', 'forwarded', 'forward_attempts']);
         });
     }
 

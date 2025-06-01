@@ -14,6 +14,12 @@ return [
      * When false, no reports will be forwarded regardless of per-endpoint settings.
      */
     'forward_enabled' => (bool) env('VIOLATIONS_FORWARD_ENABLED', true),
+
+    /**
+     * Maximum number of forwarding attempts for each violation report.
+     * After this number of failed attempts, forwarding will no longer be retried, but the report will remain in the database.
+     */
+    'max_forward_attempts' => (int) env('VIOLATIONS_MAX_FORWARD_ATTEMPTS', 3),
     /**
      * The name of the table to store reports in, if null, nothing is stored
      */
