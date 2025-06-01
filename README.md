@@ -23,6 +23,8 @@ While this package receives the reports, it doesn't do anything with them beyond
 
 ## Installation
 
+This package requires PHP 8.4 and Laravel 12 or later.
+
 Install the package with composer:
 
 ```bash
