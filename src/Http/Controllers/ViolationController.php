@@ -33,6 +33,9 @@ class ViolationController extends Controller
         'access-control-request-headers',
     ];
 
+    /**
+     * Handle a report submission from a CSP level 2 report-uri endpoint.
+     */
     public function csp(Request $request): Response
     {
         if ($request->header('Content-Type') !== 'application/csp-report') {
@@ -79,6 +82,9 @@ class ViolationController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Handle a report submission from a CSP level 3 report-to endpoint, and any other service that uses this format.
+     */
     public function reports(Request $request): Response
     {
         // Validate content type
