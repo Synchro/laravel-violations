@@ -124,16 +124,16 @@ Browsers will often send a preflight `OPTIONS` request to the reporting endpoint
 
 When a report is received, it is parsed into a matching Data Transfer Object (DTO) built using Spatie's excellent [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) package.
 
-Be aware that the reporting mechanisms are deliberately designed to be use "out of band" so that their traffic does not interfere with the performance of your site; the browser will accumulate reports and send them in batches after a delay, so you may receive multiple reports (possibly of multiple types) in a single request. The package will handle this for you, and will parse each report individually, send events, store models, etc.
+Be aware that the reporting mechanisms are deliberately designed to be use "out of band" so that their traffic does not interfere with the performance of your site; the browser will accumulate reports and send them in batches after a delay, so you may receive multiple reports (possibly of multiple types) in a single request. The package will handle this for you and will parse each report individually, send events, store models, etc.
 
 You can monitor report sending in Chrome in its dev tools under the "Application" tab, then under the "Reporting API" section.
 
 ### Trustworthy endpoints
-Testing report sending can be tricky because browsers are very picky about the circumstances under which they send reports. In particular, they will only send reports to TLS endpoints that conform to [a definition of "potentially trustworthy"](https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy), which may interfere with development practices, for example it won't send reports to endpoints with self-signed certificates.
+Testing report sending can be tricky because browsers are very picky about the circumstances under which they send reports. In particular, they will only send reports to TLS endpoints that conform to [a definition of "potentially trustworthy"](https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy), which may interfere with development practices, for example, it won't send reports to endpoints with self-signed certificates.
 
 ### Saving to the database
 If you have set a table name in the config (and run the associated migration, described above), reports will be saved in your database.
-There is a model defined in `\Synchro\Violation\Models\Violation` that you can use to query the reports stored in the database. The `report` field of this model contains the complete, unaltered report received from the client, and you can parse it using the provided DTO classes. Parsing and forwarding reports are independent of database storage – you don't have to store them.
+There is a model defined in `\Synchro\Violation\Models\Violation` that you can use to query the reports stored in the database. The `report` field of this model contains the complete, unaltered report received from the client, and you can parse it using the provided DTO classes. Parsing and forwarding reports are independent of database storage – you don't have to store them, but if storage is not enabled, reports will be discarded if forwarding fails. See below for config.
 
 ### Events
 On receiving a report, the package fires an event called `\Synchro\Violation\Events\Violation`, which you can listen for in your application to take further action, such as logging or alerting. The event carries a DTO for the report (not a model), so you can act on it directly.
@@ -141,13 +141,17 @@ On receiving a report, the package fires an event called `\Synchro\Violation\Eve
 ### Forwarding
 For each reporting endpoint you define in the config file, you can provide a URL of an external service such as [report-uri.com](https://report-uri.com). These forwarded reports are sent by dispatching a queued job called `\Synchro\Violation\Jobs\ForwardReport` that will send the report to the configured endpoint. There is also a global on/off switch for forwarding in the `VIOLATIONS_FORWARD_ENABLED` env variable.
 
+If database storage is not enabled, the report will be queued for forwarding, but if forwarding fails, the report will be discarded. If storage is enabled, the package will attempt to forward the report up to three times, but if all attempts fail, the report will still be available in the database. You can override the retry limit in your config in the `violations.max_forward_attempts` property, or the `VIOLATIONS_MAX_FORWARD_ATTEMPTS` env variable.
+
+The package configures a kernel task to retry forwarding failed reports every hour using an artisan command called `violations:queue`.
+
 ## Privacy concerns
 
 While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service. Because reports are sent directly from the client's browser to the reporting service, it reveals the fact that someone is visiting your site, their IP, and their user-agent string, to the third-party site. Such leakage is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason.
 
 When forwarding/proxying reports through this package to a reporting service, all reports will appear to originate from your server's IP addresses, not your clients' browsers. This means that things like geoIP country mapping will no longer be useful. It does, however, preserve user-agent strings, letting you spot issues relating to specific browser platforms and versions.
 
-Another reason to proxy client-side reports is if your site is on a private network that has no external internet access. In that case you need to store the reports locally, or forward them via a proxy service, or you won't see the reports at all.
+Another reason to proxy client-side reports is if your site is on a private network that has no external internet access. In that case you need to store the reports locally, or forward them via a proxy service (such as this package provides), or you won't see the reports at all.
 
 ## Testing
 
