@@ -85,8 +85,8 @@ jobs:
 
       - name: Run tests, no code coverage
         if: ${{ matrix.coverage == false }}
-        run: ./vendor/bin/phpunit --no-coverage
+        run: ./vendor/bin/pest --no-coverage
 
       - name: Run tests with code coverage
         if: ${{ matrix.coverage == true }}
-        run: vendor/bin/phpunit
+        run: vendor/bin/pest --coverage
