@@ -20,39 +20,70 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [8.4]
-        laravel: [12.*]
-        stability: [prefer-lowest, prefer-stable]
+        os: [ ubuntu-latest, windows-latest ]
+        php: [ 8.4 ]
+        laravel: [ 12.* ]
+        stability: [ prefer-lowest, prefer-stable ]
+        coverage: [ false ]
+        experimental: [ false ]
         include:
           - laravel: 12.*
             testbench: 10.*
+          - php: '8.4'
+            coverage: true
+            experimental: false
+          - php: '8.5'
+            coverage: false
+            experimental: true
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
+    continue-on-error: ${{ matrix.experimental }}
+
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          coverage: ${{ matrix.coverage && 'xdebug' || 'none' }}
           extensions: dom, curl, mbstring, pdo, sqlite, pdo_sqlite, intl, iconv, fileinfo
-          coverage: none
 
-      - name: Setup problem matchers
+      - name: Set up problem matchers
         run: |
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install PHP packages - normal
+        if: ${{ matrix.php != '8.5' }}
+        uses: "ramsey/composer-install@v3"
+        with:
+          # Bust the cache at least once a month - output format: YYYY-MM.
+          custom-cache-suffix: $(date -u "+%Y-%m")
+
+      - name: Install PHP packages - ignore-platform-reqs
+        if: ${{ matrix.php == '8.5' }}
+        uses: "ramsey/composer-install@v3"
+        with:
+          # Ignore platform requirements for experimental PHP 8.5 releases.
+          composer-options: --ignore-platform-reqs
+          # Bust the cache at least once a month - output format: YYYY-MM.
+          custom-cache-suffix: $(date -u "+%Y-%m")
 
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
-      - name: List Installed Dependencies
+      - name: List installed dependencies
         run: composer show -D
 
-      - name: Execute tests
-        run: vendor/bin/pest --ci
+      - name: Run tests, no code coverage
+        if: ${{ matrix.coverage == false }}
+        run: ./vendor/bin/phpunit --ci --no-coverage
+
+      - name: Run tests with code coverage
+        if: ${{ matrix.coverage == true }}
+        run: vendor/bin/phpunit --ci
