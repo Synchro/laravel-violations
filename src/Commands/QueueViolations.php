@@ -51,7 +51,7 @@ class QueueViolations extends Command
                 $forwardToUrl = $this->getForwardingUrlForReportSource($violation->report_source);
 
                 if ($forwardToUrl) {
-                    // Parse the JSON report back to appropriate DTO
+                    // Parse the JSON report back to its appropriate DTO
                     $report = $this->parseReportToDto($violation);
 
                     if ($report) {
