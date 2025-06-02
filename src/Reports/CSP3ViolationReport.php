@@ -40,9 +40,4 @@ class CSP3ViolationReport extends Data
         #[Max(2048)]
         readonly public string $url = '',
     ) {}
-
-    public function getReportType(): NetworkReportingReportType
-    {
-        return NetworkReportingReportType::CSP;
-    }
 }
