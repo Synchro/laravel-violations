@@ -77,10 +77,7 @@
         "laravel": {
             "providers": [
                 "Synchro\\Violation\\ViolationServiceProvider"
-            ],
-            "aliases": {
-                "Violation": "Synchro\\Violation\\Facades\\Violation"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",
