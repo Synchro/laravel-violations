@@ -255,3 +255,21 @@ it('can receive multiple reports in a single request', function () {
         ->and($response->content())
         ->toBeEmpty();
 });
+
+it('rejects an invalid CSP2 content-type', function () {
+    $response = $this->call(
+        'POST',
+        action([ViolationController::class, 'csp']),
+        [],
+        [],
+        [],
+        [
+            'CONTENT_TYPE' => 'application/json',
+            'CONTENT_LENGTH' => 0,
+            'HTTP_ACCEPT' => '*/*',
+        ],
+        '{}',
+    );
+
+    expect($response->status())->toBe(400);
+});
