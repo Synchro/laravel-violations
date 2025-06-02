@@ -32,12 +32,14 @@ jobs:
           - php: '8.4'
             os: ubuntu-latest
             laravel: 12.*
+            testbench: 10.*
             stability: prefer-stable
             coverage: true
             experimental: false
           - php: '8.5'
             os: ubuntu-latest
             laravel: 12.*
+            testbench: 10.*
             stability: prefer-stable
             coverage: false
             experimental: true
