@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Synchro\Violation;
 
+use InvalidArgumentException;
 use Synchro\Violation\Enums\ReportSource;
 
 class Violation
@@ -93,6 +94,6 @@ class Violation
             return is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
         }
 
-        throw new \InvalidArgumentException('Endpoint must have either "route_suffix", "route", or "url" key');
+        throw new InvalidArgumentException('Endpoint must have either "route_suffix", "route", or "url" key');
     }
 }
