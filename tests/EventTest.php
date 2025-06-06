@@ -53,10 +53,13 @@ it('fires a Violation event when an NEL report is received via a reports endpoin
         'body' => [
             'referrer' => 'https://www.example.com/',
             'protocol' => 'h2',
-            'status-code' => 0,
-            'elapsed-time' => 143,
+            'status_code' => 0,
+            'elapsed_time' => 143,
             'age' => 5,
-            'type' => 'http.dns.name_not_resolved',
+            'type' => 'dns.name_not_resolved',
+            'phase' => 'dns',
+            'type' => 'dns.name_not_resolved',
+            'sampling_fraction' => 1.0,
         ],
     ];
 
