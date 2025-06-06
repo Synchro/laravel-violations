@@ -170,6 +170,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 This package was written by Marcus Bointon, [@Synchro on GitHub](https://github.com/Synchro), and is released under the MIT open-source license. If you rely on it, please consider becoming [a GitHub Sponsor](https://github.com/sponsors/Synchro).
 
+![Report-uri.com](./report-uri-full.svg)
 Development of this package was supported by [report-uri.com](https://report-uri.com), a service that provides a simple way to aggregate and summarise vast volumes of client-side reports including CSP and NEL.
 
 ## License
