@@ -14,10 +14,12 @@ it('creates a NEL report from network-error data', function () {
         'body' => [
             'referrer' => 'https://www.example.com/',
             'protocol' => 'h2',
-            'status-code' => 0,
-            'elapsed-time' => 143,
+            'status_code' => 0,
+            'elapsed_time' => 143,
             'age' => 5,
-            'type' => 'http.dns.name_not_resolved',
+            'phase' => 'dns',
+            'type' => 'dns.name_not_resolved',
+            'sampling_fraction' => 1.0,
         ],
     ];
 
@@ -28,7 +30,7 @@ it('creates a NEL report from network-error data', function () {
         ->and($report->type)->toBe(NetworkReportingReportType::NEL)
         ->and($report->age)->toBe(29)
         ->and($report->url)->toBe('https://example.com/script.js')
-        ->and($report->body->type)->toBe('http.dns.name_not_resolved');
+        ->and($report->body->type)->toBe('dns.name_not_resolved');
 });
 
 it('creates a CSP violation report from csp-violation data', function () {

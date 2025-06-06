@@ -24,20 +24,20 @@ class NELBody extends ReportBody
      */
     public function __construct(
         // The sampling fraction used to determine this report.
-        #[MapName('sampling-fraction'), Min(0), Max(1)]
-        readonly public float $samplingFraction = 1.0,
+        #[MapName('sampling_fraction'), Min(0), Max(1)]
+        readonly public float $samplingFraction,
         // How long this took.
-        #[MapName('elapsed-time'), Min(0)]
-        readonly public int $elapsedTime = 0,
+        #[MapName('elapsed_time'), Min(0)]
+        readonly public int $elapsedTime,
         // How long after the request this happened.
         #[Min(0)]
-        readonly public int $age = 0,
+        readonly public int $age,
         // The point in request processing that this happened.
         readonly public NELPhase $phase,
         // The type of the network error
         readonly public string $type = '',
         // The IP address of the server that was contacted.
-        #[MapName('server-ip'), IPv4, IPv6]
+        #[MapName('server_ip'), IPv4, IPv6]
         readonly public string $serverIp = '',
         // The protocol used to make the request.
         readonly public string $protocol = '',
@@ -46,15 +46,15 @@ class NELBody extends ReportBody
         // The HTTP method that triggered the error.
         readonly public string $method = '',
         // The HTTP status code received (can be 0 for non-HTTP errors, e.g. DNS).
-        #[MapName('status-code'), Min(0), Max(599)]
+        #[MapName('status_code'), Min(0), Max(599)]
         readonly public int $statusCode = 0,
         // The URL of the resource where the violation occurred.
         readonly public string $url = '',
         // The headers from the request
-        #[MapName('request-headers')]
+        #[MapName('request_headers')]
         readonly public array $requestHeaders = [],
         // The headers from the response
-        #[MapName('response-headers')]
+        #[MapName('response_headers')]
         readonly public array $responseHeaders = [],
     ) {}
 }

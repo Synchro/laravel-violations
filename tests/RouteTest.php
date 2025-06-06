@@ -104,10 +104,12 @@ it('can receive an NEL report via a reports endpoint', function () {
         'body' => [
             'referrer' => 'https://www.example.com/',
             'protocol' => 'h2',
-            'status-code' => 0,
-            'elapsed-time' => 143,
+            'status_code' => 0,
+            'elapsed_time' => 143,
             'age' => 5,
-            'type' => 'http.dns.name_not_resolved',
+            'phase' => 'dns',
+            'type' => 'dns.name_not_resolved',
+            'sampling_fraction' => 1.0,
         ],
     ];
     $reportData = json_encode($report);
@@ -215,10 +217,12 @@ it('can receive multiple reports in a single request', function () {
             'body' => [
                 'referrer' => 'https://www.example.com/',
                 'protocol' => 'h2',
-                'status-code' => 0,
-                'elapsed-time' => 143,
+                'status_code' => 0,
+                'elapsed_time' => 143,
                 'age' => 5,
-                'type' => 'http.dns.name_not_resolved',
+                'phase' => 'dns',
+                'type' => 'dns.name_not_resolved',
+                'sampling_fraction' => 1.0,
             ],
         ],
         [

@@ -77,21 +77,21 @@ it('parses an NEL report', function () {
   "timestamp": 1700000000,
   "attempts": 1,
   "body": {
-    "sampling-fraction": 1.0,
-    "elapsed-time": 143,
+    "sampling_fraction": 1.0,
+    "elapsed_time": 143,
     "age": 5,
     "phase": "dns",
     "type": "http.dns.name_not_resolved",
     "referrer": "https://www.example.com/",
-    "server-ip": "192.168.0.123",
+    "server_ip": "192.168.0.123",
     "protocol": "xyz",
     "method": "GET",
-    "status-code": 323,
+    "status_code": 323,
     "url": "https://example.com/thing.js",
-    "request-headers": {
+    "request_headers": {
       "User-Agent": ["Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"]
     },
-    "response-headers": {
+    "response_headers": {
       "Content-Type": ["application/javascript"]
     }
   }
@@ -138,21 +138,21 @@ it('can reconstruct an NEL report', function () {
   "timestamp": 1700000000,
   "attempts": 1,
   "body": {
-    "sampling-fraction": 1.0,
-    "elapsed-time": 143,
+    "sampling_fraction": 1.0,
+    "elapsed_time": 143,
     "age": 5,
     "phase": "dns",
     "type": "http.dns.name_not_resolved",
     "referrer": "https://www.example.com/",
-    "server-ip": "192.168.0.123",
+    "server_ip": "192.168.0.123",
     "protocol": "xyz",
     "method": "GET",
-    "status-code": 323,
+    "status_code": 323,
     "url": "https://example.com/thing.js",
-    "request-headers": {
+    "request_headers": {
       "User-Agent": ["Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"]
     },
-    "response-headers": {
+    "response_headers": {
       "Content-Type": ["application/javascript"]
     }
   }
