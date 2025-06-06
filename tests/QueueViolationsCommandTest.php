@@ -69,7 +69,7 @@ it('queues CSP2 violations for forwarding', function () {
         ],
     ]]);
 
-    $violation = Violation::factory()->create([
+    Violation::factory()->create([
         'report_source' => ReportSource::REPORT_URI,
         'report' => ['csp-report' => ['test' => 'data']],
         'forwarded' => false,
@@ -94,7 +94,7 @@ it('queues CSP3 violations for forwarding', function () {
         ],
     ]]);
 
-    $violation = Violation::factory()->create([
+    Violation::factory()->create([
         'report_source' => ReportSource::REPORT_TO,
         'report' => [
             'type' => 'csp-violation',
@@ -132,7 +132,7 @@ it('queues NEL violations for forwarding', function () {
         ],
     ]]);
 
-    $violation = Violation::factory()->create([
+    Violation::factory()->create([
         'report_source' => ReportSource::REPORT_TO,
         'report' => [
             'type' => 'network-error',
