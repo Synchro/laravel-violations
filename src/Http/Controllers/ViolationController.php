@@ -15,7 +15,7 @@ use Synchro\Violation\Enums\ReportSource;
 use Synchro\Violation\Events\Violation as ViolationEvent;
 use Synchro\Violation\Jobs\ForwardReport;
 use Synchro\Violation\Models\Violation;
-use Synchro\Violation\Reports\CSP2ReportData;
+use Synchro\Violation\Reports\CSP2Report;
 use Synchro\Violation\Reports\ReportFactory;
 
 class ViolationController extends Controller
@@ -38,8 +38,8 @@ class ViolationController extends Controller
      */
     public function csp(Request $request): Response
     {
-        if ($request->header('Content-Type') !== 'application/csp-report') {
-            throw new BadRequestHttpException('Invalid Content-Type; must be \'application/csp-report\'');
+        if ($request->header('Content-Type') !== CSP2Report::MIME_TYPE) {
+            throw new BadRequestHttpException("Invalid Content-Type; must be '".CSP2Report::MIME_TYPE."'");
         }
         try {
             $jsonData = json_decode(
@@ -51,7 +51,7 @@ class ViolationController extends Controller
             abort(Response::HTTP_BAD_REQUEST, 'Invalid JSON data');
         }
         // Manually create the DTO from the decoded JSON data
-        $report = CSP2ReportData::from($request->getContent());
+        $report = CSP2Report::from($jsonData);
 
         $userAgent = config('violations.sanitize') ? null : $request->header('User-Agent');
         $ip = config('violations.sanitize') ? null : $request->ip();

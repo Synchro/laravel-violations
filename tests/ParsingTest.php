@@ -1,7 +1,7 @@
 <?php
 
 use Synchro\Violation\Enums\NetworkReportingReportType;
-use Synchro\Violation\Reports\CSP2ReportData;
+use Synchro\Violation\Reports\CSP2Report;
 use Synchro\Violation\Reports\ReportFactory;
 
 it('parses a CSP2 report', function () {
@@ -22,7 +22,7 @@ it('parses a CSP2 report', function () {
         JSON_THROW_ON_ERROR,
     );
 
-    $data = CSP2ReportData::from($report);
+    $data = CSP2Report::from($report);
 
     expect($data->cspReport->documentURI)
         ->toBe('http://example.org/page.html')

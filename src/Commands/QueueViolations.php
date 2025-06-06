@@ -7,7 +7,7 @@ use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\ReportSource;
 use Synchro\Violation\Jobs\ForwardReport;
 use Synchro\Violation\Models\Violation;
-use Synchro\Violation\Reports\CSP2ReportData;
+use Synchro\Violation\Reports\CSP2Report;
 use Synchro\Violation\Reports\ReportFactory;
 
 use function Laravel\Prompts\progress;
@@ -99,7 +99,7 @@ class QueueViolations extends Command
         try {
             if ($violation->report_source === ReportSource::REPORT_URI) {
                 // CSP2 reports are stored differently - need to reconstruct from JSON
-                return CSP2ReportData::from(json_encode($violation->report));
+                return CSP2Report::from(json_encode($violation->report));
             } else {
                 // CSP3 and NEL reports can use ReportFactory
                 return ReportFactory::from($violation->report);

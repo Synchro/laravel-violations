@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Event;
 use Synchro\Violation\Events\Violation as ViolationEvent;
+use Synchro\Violation\Reports\CSP2Report;
+use Synchro\Violation\Reports\Report;
 
-it('fires a Violation event when a CSP report is received', function () {
+it('fires a Violation event when a CSP2 report is received', function () {
     Event::fake();
 
     $report = [
@@ -26,10 +28,10 @@ it('fires a Violation event when a CSP report is received', function () {
         [],
         [],
         [
-            'CONTENT_TYPE' => 'application/csp-report',
+            'CONTENT_TYPE' => CSP2Report::MIME_TYPE,
             'CONTENT_LENGTH' => strlen($reportData),
         ],
-        $reportData
+        $reportData,
     );
 
     $response->assertNoContent();
@@ -67,10 +69,10 @@ it('fires a Violation event when an NEL report is received via a reports endpoin
         [],
         [],
         [
-            'CONTENT_TYPE' => 'application/reports+json',
+            'CONTENT_TYPE' => Report::MIME_TYPE,
             'CONTENT_LENGTH' => strlen($reportData),
         ],
-        $reportData
+        $reportData,
     );
 
     $response->assertNoContent();
@@ -101,10 +103,10 @@ it('passes the correct violation data in the event', function () {
         [],
         [],
         [
-            'CONTENT_TYPE' => 'application/csp-report',
+            'CONTENT_TYPE' => CSP2Report::MIME_TYPE,
             'CONTENT_LENGTH' => strlen($reportData),
         ],
-        $reportData
+        $reportData,
     );
 
     $response->assertNoContent();

@@ -2,6 +2,7 @@
 
 use Symfony\Component\HttpFoundation\Response;
 use Synchro\Violation\Http\Controllers\ViolationController;
+use Synchro\Violation\Reports\CSP2Report;
 
 it('can serve an OPTIONS request for a CSP2 endpoint', function () {
     $this->withoutExceptionHandling();
@@ -25,7 +26,7 @@ it('can serve an OPTIONS request for a reports endpoint', function () {
         ->toBe('*');
 });
 
-it('can receive a CSP report-uri report', function () {
+it('can receive a CSP2 report-uri report', function () {
     $this->withoutExceptionHandling();
     $report =
         [
@@ -50,7 +51,7 @@ it('can receive a CSP report-uri report', function () {
         [],
         [],
         [
-            'CONTENT_TYPE' => 'application/csp-report',
+            'CONTENT_TYPE' => CSP2Report::MIME_TYPE,
             'CONTENT_LENGTH' => strlen($reportData),
             'HTTP_ACCEPT' => '*/*',
         ],
@@ -71,7 +72,7 @@ it('rejects invalid JSON', function () {
         [],
         [],
         [
-            'CONTENT_TYPE' => 'application/csp-report',
+            'CONTENT_TYPE' => CSP2Report::MIME_TYPE,
             'CONTENT_LENGTH' => 0,
             'HTTP_ACCEPT' => '*/*',
         ],
