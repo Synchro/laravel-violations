@@ -56,7 +56,6 @@ it('fires a Violation event when an NEL report is received via a reports endpoin
             'status_code' => 0,
             'elapsed_time' => 143,
             'age' => 5,
-            'type' => 'dns.name_not_resolved',
             'phase' => 'dns',
             'type' => 'dns.name_not_resolved',
             'sampling_fraction' => 1.0,
