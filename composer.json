@@ -1,5 +1,6 @@
 {
     "name": "synchro/laravel-violations",
+    "type": "library",
     "description": "Client-side report handling for CSP and NEL for Laravel",
     "keywords": [
         "Marcus Bointon",
@@ -12,7 +13,8 @@
         "report-uri",
         "report-to",
         "privacy",
-        "Reporting Endpoints"
+        "Reporting Endpoints",
+        "Reporting API"
     ],
     "homepage": "https://github.com/synchro/laravel-violations",
     "license": "MIT",
