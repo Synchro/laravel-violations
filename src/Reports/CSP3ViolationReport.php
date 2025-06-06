@@ -18,7 +18,7 @@ class CSP3ViolationReport extends Report
 {
     public function __construct(
         // The report type
-        readonly public NetworkReportingReportType $type = NetworkReportingReportType::NEL,
+        readonly public NetworkReportingReportType $type,
         // The report body containing CSP-specific violation data
         readonly public CSP3ViolationBody $body,
         // The client's user-agent string

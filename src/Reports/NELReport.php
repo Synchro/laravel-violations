@@ -18,7 +18,7 @@ class NELReport extends Report
 {
     public function __construct(
         // The report type
-        readonly public NetworkReportingReportType $type = NetworkReportingReportType::CSP,
+        readonly public NetworkReportingReportType $type,
         // The report body containing NEL-specific data
         readonly public NELBody $body,
         // The client's user-agent string
