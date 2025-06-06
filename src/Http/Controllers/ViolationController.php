@@ -148,9 +148,6 @@ class ViolationController extends Controller
 
     private static function validateAccessControlRequestHeaders(string $headerValue): bool
     {
-        // Normalize allowed headers to lowercase
-        $allowedHeaders = array_map('strtolower', self::ALLOWED_HEADERS);
-
         // Split the header value into individual headers
         $requestedHeaders = explode(',', $headerValue);
 
