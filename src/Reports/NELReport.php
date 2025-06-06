@@ -7,7 +7,6 @@ namespace Synchro\Violation\Reports;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
-use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\NetworkReportingReportType;
 
 /**
@@ -15,11 +14,11 @@ use Synchro\Violation\Enums\NetworkReportingReportType;
  *
  * @see https://www.w3.org/TR/reporting-1/#queue-report
  */
-class NELReport extends Data
+class NELReport extends Report
 {
     public function __construct(
         // The report type
-        readonly public NetworkReportingReportType $type,
+        readonly public NetworkReportingReportType $type = NetworkReportingReportType::CSP,
         // The report body containing NEL-specific data
         readonly public NELBody $body,
         // The client's user-agent string

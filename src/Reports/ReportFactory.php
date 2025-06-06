@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Synchro\Violation\Reports;
 
 use Synchro\Violation\Enums\NetworkReportingReportType;
 
 class ReportFactory
 {
-    public static function from(array $data): NELReport|CSP3ViolationReport
+    public static function from(array $data): Report
     {
         if (! isset($data['type'])) {
             throw new \InvalidArgumentException('Report data must contain a "type" field');
