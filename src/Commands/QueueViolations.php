@@ -2,6 +2,7 @@
 
 namespace Synchro\Violation\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\ReportSource;
@@ -104,7 +105,7 @@ class QueueViolations extends Command
                 // CSP3 and NEL reports can use ReportFactory
                 return ReportFactory::from($violation->report);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error(__('Failed to parse report for violation ID :id: :error', [
                 'id' => $violation->id,
                 'error' => $e->getMessage(),
