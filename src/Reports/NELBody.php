@@ -9,6 +9,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv4;
 use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Synchro\Violation\Enums\NELPhase;
 
 /**
  * Class representing a Network Error Report body sent to a report-to URL in an NEL header.
@@ -32,7 +33,7 @@ class NELBody extends ReportBody
         #[Min(0)]
         readonly public int $age = 0,
         // The point in request processing that this happened.
-        readonly public string $phase = '',
+        readonly public NELPhase $phase,
         // The type of the network error
         readonly public string $type = '',
         // The IP address of the server that was contacted.

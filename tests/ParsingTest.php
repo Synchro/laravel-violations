@@ -1,5 +1,6 @@
 <?php
 
+use Synchro\Violation\Enums\NELPhase;
 use Synchro\Violation\Enums\NetworkReportingReportType;
 use Synchro\Violation\Reports\CSP2Report;
 use Synchro\Violation\Reports\ReportFactory;
@@ -117,7 +118,7 @@ it('parses an NEL report', function () {
         ->and($data->body->elapsedTime)->toBe(143)
         ->and($data->body->age)->toBe(5)
         ->and($data->body->type)->toBe('http.dns.name_not_resolved')
-        ->and($data->body->phase)->toBe('dns')
+        ->and($data->body->phase)->toBe(NELPhase::DNS)
         ->and($data->body->url)->toBe('https://example.com/thing.js')
         ->and($data->body->requestHeaders)->toEqual([
             'User-Agent' => ['Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0'],
