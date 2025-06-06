@@ -5,13 +5,16 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/synchro/laravel-violations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/synchro/laravel-violations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/synchro/laravel-violations.svg?style=flat-square)](https://packagist.org/packages/synchro/laravel-violations)
 
-This package provides a way to handle client-side error reports in Laravel.
+This package provides a way to configure client-side reporting endpoint headers and handle the reports that they generate in Laravel.
 
 Client-side errors can be reported by the `Content-Security-Policy` (CSP), Network Error Logging (`NEL`), `Permissions-Policy`, and several other mechanisms.
 
 These headers make use of the `report-to` directive from CSP level 3, which targets a [named reporting endpoint](https://www.w3.org/TR/reporting-1/), and the deprecated `report-uri` directive from CSP level 2, which includes the reporting URL directly inside the CSP.
 
-Aside from CSP2's `report-uri` directive, the URLs themselves are defined in a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to. The `Report-To` header provides similar information, but is both deprecated and not widely supported.
+Aside from CSP2's `report-uri` directive, the URLs themselves are defined in a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to. The similar `Report-To` header was defined in an earlier revision of the standard, but has since been removed from the spec. However, some browsers implemented it, and the NEL header only works with `Report-To`, so this package supports both mechanisms by default.
+
+> [! Tip]
+> You can find a good discussion of the differences between revisions of the Reporting API spec, and how to migrate between them on the [Chrome for developers blog](https://developer.chrome.com/blog/reporting-api-migration/).
 
 This package can store the reports in the database and/or forward them to a report aggregation service, such as [report-uri.com](https://report-uri.com), allowing you to manage the enormous volumes of reports that are often generated without impacting the privacy of your users. Each report type has a DTO class that you can use to parse the report content.
 
@@ -44,19 +47,13 @@ php artisan vendor:publish --tag="violations-migrations"
 php artisan migrate
 ```
 
-## Usage
+## How reporting works
 
 It's worth reading [the docs on CSP violation reporting](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP#enabling_reporting).
 
 There are two ways of defining target URLs to send reports to in CSP.
 
-The preferred mechanism is [the `report-to` directive from CSP level 3](https://w3c.github.io/webappsec-csp/#directive-report-to) which targets a [named reporting endpoint](https://www.w3.org/TR/reporting-1/) from a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to, like this:
-
-```http header
-Reporting-Endpoints: reports="https://example.com/report", nel="https://example.com/nel"
-Content-Security-Policy: default-src 'self'; report-to reports
-NEL: {"report-to": "nel"}
-```
+The preferred mechanism is [the `report-to` directive from CSP level 3](https://w3c.github.io/webappsec-csp/#directive-report-to) which targets a [named reporting endpoint](https://www.w3.org/TR/reporting-1/) from a `Reporting-Endpoints` or `Report-To` header, which can define one or more named endpoints to send reports to.
 
 The second mechanism is [the deprecated `report-uri` directive defined in CSP level 2](https://www.w3.org/TR/CSP2/#directive-report-uri), which includes the reporting URL directly inside the CSP:
 
@@ -67,6 +64,15 @@ Content-Security-Policy: default-src 'self'; report-uri https://example.com/csp
 One other difference is that `report-uri` can contain multiple URLs, whereas `report-to` can only contain a single target name. For compatibility with both at once, *this package only supports creating a single reporting URL per named endpoint*.
 
 It's safe to define both directives; browsers that support `report-to` will ignore `report-uri` if it's also present, as per [the CSP level 3 spec](https://w3c.github.io/webappsec-csp/#directive-report-uri), and browsers that don't support `report-to` won't know what they're missing. The world is currently in a transition period where `report-uri` is deprecated, but support for `report-to` remains thin, so it's best to support both for now. Keep an eye on [caniuse.com](https://caniuse.com/mdn-http_headers_content-security-policy_report-to) for browser support updates.
+
+Here's a complete example using both headers, along with CSP and NEL headers using them, along with a `report-uri` directive for CSP level 2: 
+
+```http header
+Reporting-Endpoints: reports="https://example.com/report"
+Report-To: {"group":"reports","max_age":86400,"endpoints":[{"url":"https://example.com/report"}]}, {"group":"nel","max_age":86400,"endpoints":[{"url":"https://example.com/nel"}]}
+Content-Security-Policy: default-src 'self'; report-to reports; report-uri https://example.com/csp;
+NEL: {"report-to": "nel"}
+```
 
 ## Creating reporting headers
 This package provides a middleware that will add both the `Reporting-Endpoints` and deprecated `Report-To` headers to your responses, either of which is required for the `report-to` directive to work in either CSP3 or NEL. You can add this as global middleware (so it will be added to all responses) in `bootstrap/app.php`:
@@ -82,7 +88,7 @@ use \Synchro\Violation\Http\Middleware\AddReportingHeaders;
 You can also add it to specific routes or route groups if you only want it to apply to certain parts of your application.
 
 ## Creating your CSP header
-This package does not generate your `Content-Security-Policy` header for you, but you can create one manually or using Spatie's [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp) package.
+This package does not generate your `Content-Security-Policy` header for you, but you can create one manually or using Spatie's [spatie/laravel-csp](https://packagist.org/packages/spatie/laravel-csp) package, and use this package to generate appropriate values to put in it.
 
 ### Building your own CSP
 You can set a CSP header manually on responses and use this package to generate the correct value for the directives you need. For example, to set the `report-to` directive, you can do something like this in your controller or middleware:
@@ -105,13 +111,16 @@ There is also a `Spatie\Csp\Preset` class ready to use in `\Synchro\Violation\Su
 
 ## Network Error Logging (NEL)
 This class also handles [Network Error Logging](https://www.w3.org/TR/network-error-logging/) reports. These are sent when a client-side network error occurs, such as a DNS lookup failure, TCP or TLS handshake failure (e.g. your CDN's certificate expired), or application-level HTTP events like forwarding loops or user aborts.
-You can set up an `NEL` header in your application that points at a named reporting endpoint defined in `Reporting-Endpoints` header, like this:
+You can set up an `NEL` header in your application that points at a named reporting endpoint defined in `Report-To` header, like this:
 
 ```
 NEL: {"report-to": "nel"}
 ```
 
 Just like CSP, creating this header is left up to you, but note that the `report-to` target URLs *are* managed by this package, so use the same names.
+
+> [!WARNING]
+> NEL *only* supports endpoints defined with the `Report-To` header; the NEL spec does not yet know about `Reporting-Endpoints`, so it's not supported that way (yet).
 
 ## Receiving reports – routes and controllers
 The package provides a route macro that you can use to define all the routes you need to receive reports. By default, it is configured to receive CSP level 3 and NEL reports (and any other `report-to`-compatible mechanism) at `/violations/reports`, and CSP level 2 reports at `/violations/csp`. You can change these by setting the prefix in your `.env` file, and configuring the suffixes in the endpoints defined in config – read the config file for more details. The short version is to add this line to your `web.php` route file:
@@ -120,15 +129,21 @@ The package provides a route macro that you can use to define all the routes you
 Route::violations();
 ```
 
-These routes point at a controller in `\Synchro\Violation\Http\Controllers\ViolationController`.
+These routes point at a controller in `\Synchro\Violation\Http\Controllers\ViolationController` that provides a method to receive CSP2 reports called `csp()`, and one to handle CSP3, NEL, etc, called `reports()`.
 
-Browsers will often send a preflight `OPTIONS` request to the reporting endpoint to check cross-origin permission (CORS) before sending the actual report; these routes are also set up for you. None of these endpoints are intended to work directly in a browser; sending `GET` requests to reporting endpoints will result in `405 Method not Allowed` errors.
+Browsers will often send a preflight `OPTIONS` request to the reporting endpoint to check cross-origin permission (CORS) before sending the actual report; these routes are also set up for you, and also handled in the controller by the `options()` method.
+
+> [!WARNING]
+> None of these endpoints are intended to work directly in a browser; sending `GET` requests to reporting endpoints will result in `405 Method Not Allowed` errors.
 
 When a report is received, it is parsed into a matching Data Transfer Object (DTO) built using Spatie's excellent [spatie/laravel-data](https://packagist.org/packages/spatie/laravel-data) package.
 
 Be aware that the reporting mechanisms are deliberately designed to work "out of band" so that their traffic does not interfere with the performance of your site; the browser will accumulate reports and send them in batches after a delay, so you may receive multiple reports (possibly of multiple types) in a single request. The package will handle this for you and will parse each report individually, send events, store models, etc.
 
 You can monitor the sending of reports in Chrome in its dev tools under the "Application" tab, then under the "Reporting API" section.
+
+> [!TIP]
+> Chrome accumulates reports for up to one minute before bundling them and sending them to reporting endpoints. For privacy reasons, only reports sharing the same source URL will be included in a bundle, so 2 issues on `page1.html` might be sent together, but reports from `page1.html` and page2.html` will always be sent separately, even if they occurred within the same minute.
 
 ### Trustworthy endpoints
 Testing report sending can be tricky because browsers are very picky about the circumstances under which they send reports. In particular, they will only send reports to TLS endpoints that conform to [a definition of "potentially trustworthy"](https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy), which may interfere with development practices, for example, it won't send reports to endpoints with self-signed certificates.
@@ -149,9 +164,9 @@ The package configures a kernel task to retry forwarding failed reports every ho
 
 ## Privacy concerns
 
-While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service. Because reports are sent directly from the client's browser to the reporting service, it reveals the fact that someone is visiting your site, their IP, and their user-agent string, to the third-party site. Data leakage like this is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason.
+While CSP and NEL reports are generally benign in content, they represent a privacy leak if you point them at a third-party aggregation service. Because reports are sent directly from the client's browser to the reporting service, it reveals the fact that someone is visiting your site, their IP, and their user-agent string, to the third-party site. Data leakage like this is flagged by [the Webbkoll privacy scanner](https://webbkoll.5july.net) for exactly this reason, and was one of the main reasons why I wrote this package.
 
-When forwarding/proxying reports through this package to a reporting service, all reports will appear to originate from your server's IP addresses, not your clients' browsers. This means that things like geoIP country mapping will no longer be useful. It does, however, preserve user-agent strings, letting you spot issues relating to specific browser platforms and versions.
+When forwarding/proxying reports through this package to a reporting service, all reports will appear to originate from your server's IP addresses, not your clients' browsers. This means that things like geoIP country mapping will no longer work. It does, however, preserve user-agent strings, letting you spot issues relating to specific browser platforms and versions.
 
 Another reason to proxy client-side reports is if your site is on a private network that has no external internet access. In that case you need to store the reports locally or forward them via a proxy service (such as this package provides), or you won't see the reports at all.
 
