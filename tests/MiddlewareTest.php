@@ -24,7 +24,7 @@ it('adds reporting headers when endpoints are configured', function () {
 
     $middleware = new AddReportingHeaders;
 
-    $request = Request::create('/', 'GET');
+    $request = Request::create('/');
     $response = $middleware->handle($request, function ($request) {
         return response('', 200);
     });
@@ -47,7 +47,7 @@ it('does not add reporting headers when no endpoints are configured', function (
 
     $middleware = new AddReportingHeaders;
 
-    $request = Request::create('/', 'GET');
+    $request = Request::create('/');
     $response = $middleware->handle($request, function ($request) {
         return response('', 200);
     });
