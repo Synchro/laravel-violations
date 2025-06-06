@@ -45,7 +45,7 @@ it('injects a report-uri directive into a Spatie CSP header using a preset', fun
 
     $middleware = new Spatie\Csp\AddCspHeaders;
 
-    $request = Request::create('/', 'GET');
+    $request = Request::create('/');
     $response = $middleware->handle($request, function ($request) {
         return response('', 200);
     });

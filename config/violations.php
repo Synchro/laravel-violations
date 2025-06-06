@@ -23,7 +23,7 @@ return [
     /**
      * The name of the table to store reports in, if null, nothing is stored
      */
-    'table' => env('VIOLATIONS_TABLE', null),
+    'table' => env('VIOLATIONS_TABLE'),
     /**
      * The base URL prefix used when registering routes with Route::violations().
      * This is the single source of truth for route naming and URL generation.
@@ -56,14 +56,14 @@ return [
             'route_suffix' => 'csp',
             'max_age' => 86400, // 1 day
             'report_source' => ReportSource::REPORT_URI,
-            'forward_to' => env('VIOLATIONS_CSP_FORWARD_TO', null),
+            'forward_to' => env('VIOLATIONS_CSP_FORWARD_TO'),
         ],
         [
             'name' => 'reports',
             'route_suffix' => 'reports',
             'max_age' => 86400, // 1 day
             'report_source' => ReportSource::REPORT_TO,
-            'forward_to' => env('VIOLATIONS_REPORTS_FORWARD_TO', null),
+            'forward_to' => env('VIOLATIONS_REPORTS_FORWARD_TO'),
         ],
     ],
 ];

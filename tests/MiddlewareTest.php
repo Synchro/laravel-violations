@@ -63,7 +63,7 @@ it('throws an error when reporting endpoints are invalid', function () {
 
     $middleware = new AddReportingHeaders;
 
-    $request = Request::create('/', 'GET');
+    $request = Request::create('/');
     $middleware->handle($request, function ($request) {
         return response('', 200);
     });
