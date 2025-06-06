@@ -27,8 +27,6 @@ class Violation extends Model
 {
     use HasFactory;
 
-    public $guarded = [];
-
     /**
      * @var list<string>
      */
