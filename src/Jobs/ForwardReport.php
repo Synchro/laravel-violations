@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 use Spatie\LaravelData\Data;
 use Synchro\Violation\Enums\ReportSource;
 use Synchro\Violation\Models\Violation;
+use Synchro\Violation\Reports\CSP2Report;
+use Synchro\Violation\Reports\Report;
 
 class ForwardReport implements ShouldQueue
 {
@@ -62,8 +64,8 @@ class ForwardReport implements ShouldQueue
             'X-Forwarded-For' => (! config('violations.sanitize') && $this->ip ? $this->ip : ''),
         ])->withBody(
             $this->report->toJson(),
-            $this->reportSource === ReportSource::REPORT_URI ? 'application/csp-report' :
-            'application/reports+json'
+            $this->reportSource === ReportSource::REPORT_URI ? CSP2Report::MIME_TYPE :
+            Report::MIME_TYPE
         )
             ->post($this->forwardToUrl);
 
