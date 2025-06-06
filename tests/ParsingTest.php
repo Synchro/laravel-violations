@@ -10,12 +10,12 @@ it('parses a CSP2 report', function () {
     $report = json_decode(
         '{
   "csp-report": {
-    "document-uri": "http://example.org/page.html",
-    "referrer": "http://evil.example.com/haxor.html",
-    "blocked-uri": "http://evil.example.com/image.png",
+    "document-uri": "https://example.org/page.html",
+    "referrer": "https://evil.example.com/haxor.html",
+    "blocked-uri": "https://evil.example.com/image.png",
     "violated-directive": "default-src \'self\'",
     "effective-directive": "img-src",
-    "original-policy": "default-src \'self\'; report-uri http://example.org/csp-report.cgi"
+    "original-policy": "default-src \'self\'; report-uri https://example.org/csp-report.cgi"
   }
 }',
         true,
@@ -26,12 +26,12 @@ it('parses a CSP2 report', function () {
     $data = CSP2Report::from($report);
 
     expect($data->cspReport->documentURI)
-        ->toBe('http://example.org/page.html')
-        ->and($data->cspReport->referrer)->toBe('http://evil.example.com/haxor.html')
-        ->and($data->cspReport->blockedURI)->toBe('http://evil.example.com/image.png')
+        ->toBe('https://example.org/page.html')
+        ->and($data->cspReport->referrer)->toBe('https://evil.example.com/haxor.html')
+        ->and($data->cspReport->blockedURI)->toBe('https://evil.example.com/image.png')
         ->and($data->cspReport->violatedDirective)->toBe("default-src 'self'")
         ->and($data->cspReport->effectiveDirective)->toBe('img-src')
-        ->and($data->cspReport->originalPolicy)->toBe("default-src 'self'; report-uri http://example.org/csp-report.cgi");
+        ->and($data->cspReport->originalPolicy)->toBe("default-src 'self'; report-uri https://example.org/csp-report.cgi");
 });
 
 it('parses a CSP3 report', function () {

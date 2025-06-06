@@ -16,7 +16,7 @@ beforeEach(function () {
 });
 
 it('forwards a CSP report correctly', function () {
-    $originalJson = '{"csp-report":{"document-uri":"http://example.org/page.html","blocked-uri":"http://evil.example.com/image.png","violated-directive":"default-src \'self\'"}}';
+    $originalJson = '{"csp-report":{"document-uri":"https://example.org/page.html","blocked-uri":"https://evil.example.com/image.png","violated-directive":"default-src \'self\'"}}';
     $report = CSP2Report::from($originalJson);
 
     $job = new ForwardReport(
@@ -79,7 +79,7 @@ it('forwards an NEL report correctly', function () {
 });
 
 it('handles a null user agent', function () {
-    $originalJson = '{"csp-report":{"document-uri":"http://example.org/"}}';
+    $originalJson = '{"csp-report":{"document-uri":"https://example.org/"}}';
     $report = CSP2Report::from($originalJson);
 
     $job = new ForwardReport(
@@ -97,7 +97,7 @@ it('handles a null user agent', function () {
 it('works without database storage', function () {
     config(['violations.table' => null]);
 
-    $originalJson = '{"csp-report":{"document-uri":"http://example.org/"}}';
+    $originalJson = '{"csp-report":{"document-uri":"https://example.org/"}}';
     $report = CSP2Report::from($originalJson);
 
     $job = new ForwardReport(
@@ -113,7 +113,7 @@ it('works without database storage', function () {
 });
 
 it('forwards to a specified URL', function () {
-    $originalJson = '{"csp-report":{"document-uri":"http://example.org/"}}';
+    $originalJson = '{"csp-report":{"document-uri":"https://example.org/"}}';
     $report = CSP2Report::from($originalJson);
 
     $job = new ForwardReport(

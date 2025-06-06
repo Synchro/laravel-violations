@@ -10,12 +10,12 @@ it('fires a Violation event when a CSP2 report is received', function () {
 
     $report = [
         'csp-report' => [
-            'document-uri' => 'http://example.org/page.html',
-            'referrer' => 'http://evil.example.com/haxor.html',
-            'blocked-uri' => 'http://evil.example.com/image.png',
+            'document-uri' => 'https://example.org/page.html',
+            'referrer' => 'https://evil.example.com/haxor.html',
+            'blocked-uri' => 'https://evil.example.com/image.png',
             'violated-directive' => 'default-src \'self\'',
             'effective-directive' => 'img-src',
-            'original-policy' => 'default-src \'self\'; report-uri http://example.org/csp-report.cgi',
+            'original-policy' => 'default-src \'self\'; report-uri https://example.org/csp-report.cgi',
         ],
     ];
 
@@ -91,8 +91,8 @@ it('passes the correct violation data in the event', function () {
 
     $report = [
         'csp-report' => [
-            'document-uri' => 'http://example.org/page.html',
-            'blocked-uri' => 'http://evil.example.com/image.png',
+            'document-uri' => 'https://example.org/page.html',
+            'blocked-uri' => 'https://evil.example.com/image.png',
             'violated-directive' => 'default-src \'self\'',
         ],
     ];
@@ -118,7 +118,7 @@ it('passes the correct violation data in the event', function () {
     // Also verify the event contains the expected data
     Event::assertDispatched(ViolationEvent::class, function ($event) {
         return $event->reportSource->value === 'report-uri' &&
-               $event->report->cspReport->documentURI === 'http://example.org/page.html' &&
-               $event->report->cspReport->blockedURI === 'http://evil.example.com/image.png';
+               $event->report->cspReport->documentURI === 'https://example.org/page.html' &&
+               $event->report->cspReport->blockedURI === 'https://evil.example.com/image.png';
     });
 });
