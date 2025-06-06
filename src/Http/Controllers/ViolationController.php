@@ -47,7 +47,7 @@ class ViolationController extends Controller
                 associative: true,
                 flags: JSON_THROW_ON_ERROR
             );
-        } catch (JsonException $e) {
+        } catch (JsonException) {
             abort(Response::HTTP_BAD_REQUEST, 'Invalid JSON data');
         }
         // Manually create the DTO from the decoded JSON data
@@ -98,7 +98,7 @@ class ViolationController extends Controller
                 associative: true,
                 flags: JSON_THROW_ON_ERROR,
             );
-        } catch (JsonException $e) {
+        } catch (JsonException) {
             abort(Response::HTTP_BAD_REQUEST, 'Invalid JSON data');
         }
 
