@@ -208,7 +208,7 @@ it('skips violations with invalid report data', function () {
 
     $this->artisan(QueueViolations::class)
         ->expectsOutput('Forwarding violation reports...')
-        ->expectsOutput("Failed to parse report for violation ID {$violation->id}: Report data must contain a \"type\" field")
+        ->expectsOutput("Failed to parse report for violation ID $violation->id: Report data must contain a \"type\" field")
         ->expectsOutput('0 violation report(s) queued for forwarding.')
         ->assertExitCode(0);
 
