@@ -13,6 +13,7 @@ use Synchro\Violation\Enums\ReportSource;
 /**
  * Declare properties.
  *
+ * @property int $id
  * @property array $report
  * @property ReportSource $report_source
  * @property string $user_agent
