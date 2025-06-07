@@ -13,7 +13,7 @@ These headers make use of the `report-to` directive from CSP level 3, which targ
 
 Aside from CSP2's `report-uri` directive, the URLs themselves are defined in a `Reporting-Endpoints` header, which can define one or more named endpoints to send reports to. The similar `Report-To` header was defined in an earlier revision of the standard, but has since been removed from the spec. However, some browsers implemented it, and the NEL header only works with `Report-To`, so this package supports both mechanisms by default.
 
-> [! Tip]
+> [!TIP]
 > You can find a good discussion of the differences between revisions of the Reporting API spec, and how to migrate between them on the [Chrome for developers blog](https://developer.chrome.com/blog/reporting-api-migration/).
 
 This package can store the reports in the database and/or forward them to a report aggregation service, such as [report-uri.com](https://report-uri.com), allowing you to manage the enormous volumes of reports that are often generated without impacting the privacy of your users. Each report type has a DTO class that you can use to parse the report content.
