@@ -143,7 +143,7 @@ Be aware that the reporting mechanisms are deliberately designed to work "out of
 You can monitor the sending of reports in Chrome in its dev tools under the "Application" tab, then under the "Reporting API" section.
 
 > [!TIP]
-> Chrome accumulates reports for up to one minute before bundling them and sending them to reporting endpoints. For privacy reasons, only reports sharing the same source URL will be included in a bundle, so 2 issues on `page1.html` might be sent together, but reports from `page1.html` and page2.html` will always be sent separately, even if they occurred within the same minute.
+> Chrome accumulates reports for up to one minute before bundling them and sending them to reporting endpoints. For privacy reasons, only reports sharing the same source URL will be included in a bundle, so 2 issues on `page1.html` might be sent together, but reports from `page1.html` and `page2.html` will always be sent separately, even if they occurred within the same minute.
 
 ### Trustworthy endpoints
 Testing report sending can be tricky because browsers are very picky about the circumstances under which they send reports. In particular, they will only send reports to TLS endpoints that conform to [a definition of "potentially trustworthy"](https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy), which may interfere with development practices, for example, it won't send reports to endpoints with self-signed certificates.
