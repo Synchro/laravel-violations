@@ -66,6 +66,38 @@ it('parses a CSP3 report', function () {
         ->and($data->body->originalPolicy)->toBe('script-src \'self\'; report-to csp-endpoint');
 });
 
+it('parses a CSP3 hash report', function () {
+    $report = json_decode(
+        '{
+  "type": "csp-hash",
+  "age": 12,
+  "url": "https://example.com/",
+  "user_agent": "Mozilla/5.0 (X11; Linux i686; rv:132.0) Gecko/20100101 Firefox/132.0",
+  "body": {
+    "document_url": "https://example.com/",
+    "subresource_url": "https://example.com/main.js",
+    "hash": "sha256-85738f8f9a7f1b04b5329c590ebcb9e425925c6d0984089c43a022de4f19c281",
+    "type": "subresource",
+    "destination": "script"
+  }
+}',
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    );
+    $data   = ReportFactory::from($report);
+    expect($data->type)
+        ->toBe(NetworkReportingReportType::CSPH)
+        ->and($data->age)->toBe(12)
+        ->and($data->url)->toBe('https://example.com/')
+        ->and($data->userAgent)->toBe('Mozilla/5.0 (X11; Linux i686; rv:132.0) Gecko/20100101 Firefox/132.0')
+        ->and($data->body->documentURL)->toBe('https://example.com/')
+        ->and($data->body->subresourceURL)->toBe('https://example.com/main.js')
+        ->and($data->body->hash)->toBe('sha256-85738f8f9a7f1b04b5329c590ebcb9e425925c6d0984089c43a022de4f19c281')
+        ->and($data->body->type)->toBe('subresource')
+        ->and($data->body->destination)->toBe('script');
+});
+
 it('parses an NEL report', function () {
     $report = json_decode(
         '{

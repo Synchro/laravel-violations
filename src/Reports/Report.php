@@ -6,7 +6,7 @@ namespace Synchro\Violation\Reports;
 
 use Spatie\LaravelData\Data;
 
-class Report extends Data
+abstract class Report extends Data
 {
     // All Reporting API reports share the same MIME type,
     // so it's used for CSP3, NEL, etc.

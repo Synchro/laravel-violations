@@ -18,8 +18,10 @@ class ReportFactory
         $type = $data['type'];
 
         return match ($type) {
+            //If you want to add support for a new report type, this is the place to do it
             NetworkReportingReportType::NEL->value => NELReport::from($data),
             NetworkReportingReportType::CSP->value => CSP3ViolationReport::from($data),
+            NetworkReportingReportType::CSPH->value => CSP3HashReport::from($data),
             default => throw new InvalidArgumentException("Unsupported report type: $type"),
         };
     }
