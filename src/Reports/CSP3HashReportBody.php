@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Synchro\Violation\Reports;
 
 use Spatie\LaravelData\Attributes\MapName;
-use Spatie\LaravelData\Attributes\Validation\Max;
-use Spatie\LaravelData\Attributes\Validation\Min;
-use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
 
 /**
  * DTO representing the body of a Content Security Policy level-3 csp-hash report sent to
