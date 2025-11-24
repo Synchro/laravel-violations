@@ -85,7 +85,7 @@ it('parses a CSP3 hash report', function () {
         512,
         JSON_THROW_ON_ERROR,
     );
-    $data   = ReportFactory::from($report);
+    $data = ReportFactory::from($report);
     expect($data->type)
         ->toBe(NetworkReportingReportType::CSPH)
         ->and($data->age)->toBe(12)
