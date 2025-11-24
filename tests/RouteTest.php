@@ -170,6 +170,79 @@ it('can receive a CSP3 report via a reports endpoint', function () {
         ->toBeEmpty();
 });
 
+it('can receive a CSP3 hash report via a reports endpoint', function () {
+    $this->withoutExceptionHandling();
+    $report = [
+        'type' => 'csp-hash',
+        'age' => 12,
+        'url' => 'https://example.com/',
+        'user_agent' => 'Mozilla/5.0 (X11; Linux i686; rv:132.0) Gecko/20100101 Firefox/132.0',
+        'body' => [
+            'document_url' => 'https://example.com/',
+            'subresource_url' => 'https://example.com/script.js',
+            'hash' => 'sha256-85738f8f9a7f1b04b5329c590ebcb9e425925c6d0984089c43a022de4f19c281',
+            'type' => 'subresource',
+            'destination' => 'script',
+        ],
+    ];
+    $reportData = json_encode($report);
+    $response = $this->call(
+        'POST',
+        action([ViolationController::class, 'reports']),
+        [],
+        [],
+        [],
+        [
+            'CONTENT_TYPE' => 'application/reports+json',
+            'CONTENT_LENGTH' => strlen($reportData),
+            'HTTP_ACCEPT' => '*/*',
+        ],
+        $reportData,
+    );
+
+    expect($response->status())
+        ->toBe(204)
+        ->and($response->content())
+        ->toBeEmpty();
+});
+
+it('can receive a permissions-policy-violation report via a reports endpoint', function () {
+    $this->withoutExceptionHandling();
+    $report = [
+        'type' => 'permissions-policy-violation',
+        'age' => 11431,
+        'url' => 'https://example.com/',
+        'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+        'body' => [
+            'policyId' => 'geolocation',
+            'sourceFile' => 'https://example.com/permissions.js',
+            'columnNumber' => 23,
+            'lineNumber' => 1,
+            'message' => 'Permissions policy violation: Geolocation access has been blocked because of a permissions policy applied to the current document. See https://crbug.com/414348233 for more details.',
+            'disposition' => 'enforce',
+        ],
+    ];
+    $reportData = json_encode($report);
+    $response = $this->call(
+        'POST',
+        action([ViolationController::class, 'reports']),
+        [],
+        [],
+        [],
+        [
+            'CONTENT_TYPE' => 'application/reports+json',
+            'CONTENT_LENGTH' => strlen($reportData),
+            'HTTP_ACCEPT' => '*/*',
+        ],
+        $reportData,
+    );
+
+    expect($response->status())
+        ->toBe(204)
+        ->and($response->content())
+        ->toBeEmpty();
+});
+
 it('rejects invalid content type for a reports endpoint', function () {
     $response = $this->call(
         'POST',

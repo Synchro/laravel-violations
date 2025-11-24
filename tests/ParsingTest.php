@@ -98,6 +98,40 @@ it('parses a CSP3 hash report', function () {
         ->and($data->body->destination)->toBe('script');
 });
 
+it('parses a permissions-policy-violation report', function () {
+    $report = json_decode(
+        '{
+    "age": 11431,
+    "body": {
+        "sourceFile": "https://example.com/permissions.js",
+        "columnNumber": 23,
+        "disposition": "enforce",
+        "lineNumber": 1,
+        "message": "Permissions policy violation: Geolocation access has been blocked because of a permissions policy applied to the current document. See https://crbug.com/414348233 for more details.",
+        "policyId": "geolocation"
+    },
+    "type": "permissions-policy-violation",
+    "url": "https://example.com/",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+}',
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    );
+    $data = ReportFactory::from($report);
+    expect($data->type)
+        ->toBe(NetworkReportingReportType::PPV)
+        ->and($data->age)->toBe(11431)
+        ->and($data->url)->toBe('https://example.com/')
+        ->and($data->userAgent)->toBe('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36')
+        ->and($data->body->policyId)->toBe('geolocation')
+        ->and($data->body->message)->toBe('Permissions policy violation: Geolocation access has been blocked because of a permissions policy applied to the current document. See https://crbug.com/414348233 for more details.')
+        ->and($data->body->sourceFile)->toBe('https://example.com/permissions.js')
+        ->and($data->body->lineNumber)->toBe(1)
+        ->and($data->body->columnNumber)->toBe(23)
+        ->and($data->body->disposition)->toBe('enforce');
+});
+
 it('parses an NEL report', function () {
     $report = json_decode(
         '{

@@ -12,4 +12,5 @@ enum NetworkReportingReportType: string
     case NEL = 'network-error';
     case CSP = 'csp-violation';
     case CSPH = 'csp-hash';
+    case PPV = 'permissions-policy-violation';
 }
