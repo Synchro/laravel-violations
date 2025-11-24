@@ -14,7 +14,9 @@
         "report-to",
         "privacy",
         "Reporting Endpoints",
-        "Reporting API"
+        "Reporting API",
+        "Permissions Policy",
+        "csp-hash"
     ],
     "homepage": "https://github.com/synchro/laravel-violations",
     "license": "MIT",
@@ -34,18 +36,18 @@
         "spatie/laravel-data": "^4.7.2"
     },
     "require-dev": {
-        "larastan/larastan": "^v3.4.0",
+        "larastan/larastan": "^3.8.0",
         "laravel/pint": "^v1.23.0",
-        "nunomaduro/collision": "^v8.8.0",
-        "orchestra/testbench": "^v10.3.0",
-        "pestphp/pest": "^v3.8.2",
-        "pestphp/pest-plugin-arch": "^v3.1.1",
-        "pestphp/pest-plugin-laravel": "^v3.2.0",
-        "pestphp/pest-plugin-type-coverage": "^3.5.1",
+        "nunomaduro/collision": "^8.8.3",
+        "orchestra/testbench": "^10.8.0",
+        "pestphp/pest": "^v4.1.4",
+        "pestphp/pest-plugin-arch": "^v4.0.0",
+        "pestphp/pest-plugin-laravel": "^v4.0.0",
+        "pestphp/pest-plugin-type-coverage": "^v4.0.3",
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan-deprecation-rules": "^2.0.3",
-        "phpstan/phpstan-phpunit": "^2.0.6",
-        "spatie/laravel-csp": "^3.13.0"
+        "phpstan/phpstan-phpunit": "^2.0.8",
+        "spatie/laravel-csp": "^3.21.0"
     },
     "suggest": {
         "spatie/laravel-csp": "For CSP report handling integration"
