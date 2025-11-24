@@ -18,25 +18,25 @@ class CSP3ViolationReport extends Report
 {
     public function __construct(
         // The report type
-        readonly public NetworkReportingReportType $type,
+        public readonly NetworkReportingReportType $type,
         // The report body containing CSP-specific violation data
-        readonly public CSP3ViolationBody $body,
+        public readonly CSP3ViolationBody $body,
         // The client's user-agent string
         #[MapName('user_agent')]
-        readonly public string $userAgent = '',
+        public readonly string $userAgent = '',
         // The number of milliseconds between report generation and the time the error occurred
         #[Min(0)]
-        readonly public int $age = 0,
+        public readonly int $age = 0,
         // The name of the reporting endpoint this was sent to
-        readonly public string $destination = '',
+        public readonly string $destination = '',
         // The time this event occurred, milliseconds since epoch
         #[Min(0)]
-        readonly public int $timestamp = 0,
+        public readonly int $timestamp = 0,
         // The number of times the client has attempted to send this report
         #[Min(0)]
-        readonly public int $attempts = 0,
+        public readonly int $attempts = 0,
         // The address of the document where the violation occurred
         #[Max(2048)]
-        readonly public string $url = '',
+        public readonly string $url = '',
     ) {}
 }

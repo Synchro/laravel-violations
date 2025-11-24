@@ -25,36 +25,36 @@ class NELBody extends ReportBody
     public function __construct(
         // The sampling fraction used to determine this report.
         #[MapName('sampling_fraction'), Min(0), Max(1)]
-        readonly public float $samplingFraction,
+        public readonly float $samplingFraction,
         // How long this took.
         #[MapName('elapsed_time'), Min(0)]
-        readonly public int $elapsedTime,
+        public readonly int $elapsedTime,
         // How long after the request this happened.
         #[Min(0)]
-        readonly public int $age,
+        public readonly int $age,
         // The point in request processing that this happened.
-        readonly public NELPhase $phase,
+        public readonly NELPhase $phase,
         // The type of the network error
-        readonly public string $type = '',
+        public readonly string $type = '',
         // The IP address of the server that was contacted.
         #[MapName('server_ip'), IPv4, IPv6]
-        readonly public string $serverIp = '',
+        public readonly string $serverIp = '',
         // The protocol used to make the request.
-        readonly public string $protocol = '',
+        public readonly string $protocol = '',
         // The referrer attribute of the document where the violation occurred.
-        readonly public string $referrer = '',
+        public readonly string $referrer = '',
         // The HTTP method that triggered the error.
-        readonly public string $method = '',
+        public readonly string $method = '',
         // The HTTP status code received (can be 0 for non-HTTP errors, e.g. DNS).
         #[MapName('status_code'), Min(0), Max(599)]
-        readonly public int $statusCode = 0,
+        public readonly int $statusCode = 0,
         // The URL of the resource where the violation occurred.
-        readonly public string $url = '',
+        public readonly string $url = '',
         // The headers from the request
         #[MapName('request_headers')]
-        readonly public array $requestHeaders = [],
+        public readonly array $requestHeaders = [],
         // The headers from the response
         #[MapName('response_headers')]
-        readonly public array $responseHeaders = [],
+        public readonly array $responseHeaders = [],
     ) {}
 }

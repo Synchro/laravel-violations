@@ -14,16 +14,16 @@ class PermissionsPolicyReportBody extends ReportBody
 {
     public function __construct(
         // The permissions policy element that was violated.
-        readonly public string $policyId = '',
+        public readonly string $policyId = '',
         // An explanation of the error.
-        readonly public string $message = '',
+        public readonly string $message = '',
         // The URL of the file in which the violation occurred. May be null or empty if the triggering script is inline.
-        readonly public string $sourceFile = '',
+        public readonly string $sourceFile = '',
         // The line number in the source file where the violation occurred.
-        readonly public int $lineNumber = 0,
+        public readonly int $lineNumber = 0,
         // The column number in the source file where the violation occurred.
-        readonly public int $columnNumber = 0,
+        public readonly int $columnNumber = 0,
         // Whether the permissions policy was in enforcing or reporting-only mode.
-        readonly public string $disposition = '',
+        public readonly string $disposition = '',
     ) {}
 }

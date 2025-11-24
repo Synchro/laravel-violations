@@ -15,6 +15,6 @@ class CSP2Report extends Data
 
     public function __construct(
         #[MapInputName('csp-report')]
-        readonly public CSP2ReportBody $cspReport
+        public readonly CSP2ReportBody $cspReport
     ) {}
 }

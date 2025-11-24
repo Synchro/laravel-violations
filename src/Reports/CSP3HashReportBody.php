@@ -17,15 +17,15 @@ class CSP3HashReportBody extends ReportBody
     public function __construct(
         // The address of the document where the violation occurred.
         #[MapName('document_url')]
-        readonly public string $documentURL = '',
+        public readonly string $documentURL = '',
         // The referrer attribute of the document where the violation occurred.
         #[MapName('subresource_url')]
-        readonly public string $subresourceURL = '',
+        public readonly string $subresourceURL = '',
         // The URI that was blocked from loading due to the policy violation.
-        readonly public string $hash = '',
+        public readonly string $hash = '',
         // The effective directive after applying the fallback directives (if any).
-        readonly public string $type = '',
+        public readonly string $type = '',
         // The effective directive after applying the fallback directives (if any).
-        readonly public string $destination = '',
+        public readonly string $destination = '',
     ) {}
 }

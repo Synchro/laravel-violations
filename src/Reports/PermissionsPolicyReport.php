@@ -18,20 +18,20 @@ class PermissionsPolicyReport extends Report
 {
     public function __construct(
         // The report type.
-        readonly public NetworkReportingReportType $type,
+        public readonly NetworkReportingReportType $type,
         // The report body containing CSP-specific violation data.
-        readonly public PermissionsPolicyReportBody $body,
+        public readonly PermissionsPolicyReportBody $body,
         // The client's user-agent string
         #[MapName('user_agent')]
-        readonly public string $userAgent = '',
+        public readonly string $userAgent = '',
         // The number of milliseconds between the time the error occurred and when the report was sent.
         #[Min(0)]
-        readonly public int $age = 0,
+        public readonly int $age = 0,
         // The number of times the client has attempted to send this report.
         #[Min(0)]
-        readonly public int $attempts = 0,
+        public readonly int $attempts = 0,
         // The address of the document where the violation occurred.
         #[Max(2048)]
-        readonly public string $url = '',
+        public readonly string $url = '',
     ) {}
 }
