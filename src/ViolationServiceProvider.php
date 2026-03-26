@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Synchro\Violation;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -35,7 +35,7 @@ class ViolationServiceProvider extends PackageServiceProvider
             $baseUrl = $baseUrl ?? config('violations.route_prefix', 'violations');
 
             Route::prefix($baseUrl)
-                ->withoutMiddleware(ValidateCsrfToken::class)
+                ->withoutMiddleware(PreventRequestForgery::class)
                 ->group(function () use ($baseUrl) {
                     // CSP2 report-uri endpoint (application/csp-report)
                     Route::options('csp', [ViolationController::class, 'options'])
@@ -58,7 +58,8 @@ class ViolationServiceProvider extends PackageServiceProvider
         $this->app->afterResolving(Schedule::class, function (Schedule $schedule) {
             // Only schedule the task if database storage is enabled
             if (config('violations.table')) {
-                $schedule->command('violations:queue')
+                $schedule
+                    ->command('violations:queue')
                     ->hourly()
                     ->name('queue-violations')
                     ->withoutOverlapping()

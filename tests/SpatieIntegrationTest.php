@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\Csp\AddCspHeaders;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
 use Spatie\Csp\Policy;
@@ -43,7 +44,7 @@ it('injects a report-uri directive into a Spatie CSP header using a preset', fun
     Config::set('csp.report_only_directives', []);
     Config::set('csp.nonce_enabled', false);
 
-    $middleware = new Spatie\Csp\AddCspHeaders;
+    $middleware = new AddCspHeaders;
 
     $request = Request::create('/');
     $response = $middleware->handle($request, function ($request) {
