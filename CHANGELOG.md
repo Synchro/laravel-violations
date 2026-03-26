@@ -4,6 +4,12 @@
 
 * Added support for `csp-hash` and `permissions-policy-violation` reports, though csp-hash reports are only supported when using CSP3 `report-to` endpoints.
 
+## Laravel Violations 2.0.0 - 2026-03-26
+
+This is a maintenance update adding Laravel 13 support.
+
+It's a major version change because Laravel 13 made a BC break in changing the `ValidateCsrfToken` middleware to `PreventRequestForgery`, preventing it from running on Laravel 12.
+
 ## Laravel Violations 1.0.0 - 2025-11-24
 
 This is a feature and maintenance update that finally sets a 1.0 version.
