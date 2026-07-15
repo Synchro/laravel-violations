@@ -20,6 +20,10 @@ class ReportFactory
 
         $type = $data['type'];
 
+        if (! is_string($type)) {
+            throw new InvalidArgumentException('Report "type" field must be a string');
+        }
+
         return match ($type) {
             // If you want to add support for a new report type, this is the place to do it
             NetworkReportingReportType::NEL->value => NELReport::from($data),

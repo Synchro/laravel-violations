@@ -32,7 +32,10 @@ class ViolationServiceProvider extends PackageServiceProvider
     {
         Route::macro('violations', function (?string $baseUrl = null) {
             // Use config value as default, allow override for backward compatibility
-            $baseUrl = $baseUrl ?? config('violations.route_prefix', 'violations');
+            if ($baseUrl === null) {
+                $prefix = config('violations.route_prefix', 'violations');
+                $baseUrl = is_string($prefix) ? $prefix : 'violations';
+            }
 
             Route::prefix($baseUrl)
                 ->withoutMiddleware(PreventRequestForgery::class)

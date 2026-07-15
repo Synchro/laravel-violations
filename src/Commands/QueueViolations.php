@@ -87,7 +87,9 @@ class QueueViolations extends Command
 
         foreach ($endpoints as $endpoint) {
             if (isset($endpoint['report_source']) && $endpoint['report_source'] === $reportSource) {
-                return $endpoint['forward_to'] ?? null;
+                $forwardTo = $endpoint['forward_to'] ?? null;
+
+                return is_string($forwardTo) ? $forwardTo : null;
             }
         }
 

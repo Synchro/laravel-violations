@@ -53,7 +53,9 @@ class Violation extends Model
 
     protected function table(): string
     {
-        return config('violations.table');
+        $table = config('violations.table');
+
+        return is_string($table) ? $table : '';
     }
 
     /**

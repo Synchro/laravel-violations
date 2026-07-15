@@ -93,6 +93,7 @@ class ViolationController extends Controller
         }
 
         try {
+            /** @var array<string, mixed> $jsonData */
             $jsonData = json_decode(
                 json: $request->getContent(),
                 associative: true,
@@ -109,7 +110,9 @@ class ViolationController extends Controller
         if (self::isArrayOfReports($jsonData)) {
             // Handle multiple reports in a single request
             foreach ($jsonData as $reportData) {
-                $this->processReport($reportData, $userAgent, $ip);
+                if (is_array($reportData)) {
+                    $this->processReport($reportData, $userAgent, $ip);
+                }
             }
         } else {
             // Handle single report
@@ -169,7 +172,7 @@ class ViolationController extends Controller
      * Process a single report from the report-to endpoint.
      * Handles storage, forwarding, and event dispatch for individual reports.
      *
-     * @param  array<string, mixed>  $reportData
+     * @param  array<mixed, mixed>  $reportData
      */
     private function processReport(array $reportData, ?string $userAgent, ?string $ip): void
     {
@@ -210,7 +213,9 @@ class ViolationController extends Controller
 
         foreach ($endpoints as $endpoint) {
             if (isset($endpoint['report_source']) && $endpoint['report_source'] === $reportSource) {
-                return $endpoint['forward_to'] ?? null;
+                $forwardTo = $endpoint['forward_to'] ?? null;
+
+                return is_string($forwardTo) ? $forwardTo : null;
             }
         }
 
@@ -221,7 +226,7 @@ class ViolationController extends Controller
      * Reports from CSP & NEL report-to endpoints can contain either a bare report object or an array of multiple report objects.
      * Check whether the array is multiple reports or just one.
      *
-     * @param  array<int, mixed>  $reports
+     * @param  array<mixed, mixed>  $reports
      */
     private static function isArrayOfReports(array $reports): bool
     {

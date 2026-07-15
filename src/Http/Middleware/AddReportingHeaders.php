@@ -23,7 +23,9 @@ class AddReportingHeaders
         /** @var Response $response */
         $response = $next($request);
 
-        if (count(config('violations.endpoints')) > 0) {
+        /** @var array<int, array<string, mixed>> $endpoints */
+        $endpoints = config('violations.endpoints');
+        if (count($endpoints) > 0) {
             $response->header('Reporting-Endpoints', Violation::reportingEndpointsHeaderValue());
             $response->header('Report-To', Violation::reportToHeaderValue());
         }

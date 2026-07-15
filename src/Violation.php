@@ -52,8 +52,9 @@ class Violation
             // Extract just the name and url from the endpoint list, format them as name=url
             ->map(function (array $endpoint) {
                 $url = self::resolveEndpointUrl($endpoint);
+                $name = is_string($endpoint['name'] ?? null) ? $endpoint['name'] : '';
 
-                return $endpoint['name'].'="'.$url.'"';
+                return $name.'="'.$url.'"';
             })
             ->implode(', ');
     }
@@ -95,19 +96,37 @@ class Violation
     {
         if (isset($endpoint['route_suffix'])) {
             $routePrefix = config('violations.route_prefix', 'violations');
-            $routeName = $routePrefix.'.'.$endpoint['route_suffix'];
+            $routePrefix = is_string($routePrefix) ? $routePrefix : 'violations';
+            $routeSuffix = is_string($endpoint['route_suffix']) ? $endpoint['route_suffix'] : '';
+            $routeName = $routePrefix.'.'.$routeSuffix;
 
             return route($routeName);
         }
 
         if (isset($endpoint['route'])) {
-            return route($endpoint['route']);
+            $route = is_string($endpoint['route']) ? $endpoint['route'] : '';
+
+            return route($route);
         }
 
         if (isset($endpoint['url'])) {
-            return is_callable($endpoint['url']) ? $endpoint['url']() : $endpoint['url'];
+            return is_callable($endpoint['url'])
+                ? self::resolveCallableUrl($endpoint['url'])
+                : (is_string($endpoint['url']) ? $endpoint['url'] : '');
         }
 
         throw new InvalidArgumentException('Endpoint must have either "route_suffix", "route", or "url" key');
+    }
+
+    /**
+     * Invoke a callable URL resolver and return the resulting string.
+     *
+     * @param  callable(): mixed  $url
+     */
+    private static function resolveCallableUrl(mixed $url): string
+    {
+        $resolved = $url();
+
+        return is_string($resolved) ? $resolved : '';
     }
 }
