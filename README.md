@@ -142,6 +142,17 @@ Just as for CSP, creating this header is left up to you, but note that the `repo
 > [!TIP]
 > Be aware that NEL isn't very useful for site owners because it sends reports to the domain hosting the resource that failed to load, so if your site loads resources from third-party CDNs, it will send reports to them, not to you. You can only get reports for resources served from your own domain, which you would find out about from your own regular server logs anyway. It might be useful if you're operating a CDN, but not so much otherwise.
 
+## Connection-Allowlist reporting
+The `Connection-Allowlist` header is a new header (currently only [implemented experimentally in Chrome](https://developer.chrome.com/blog/connection-allowlists-origin-trial)) that allows you to specify URL patterns that your web pages are allowed to connect to. It's similar to `connect-src` in CSP, but provides more control, and applies to all types of connections, including Fetch, WebRTC, Web Payments, WebTransport, DNS prefetch, and others.
+
+A `Connection-Allowlist` header might look like this:
+
+```
+Connection-Allowlist: ("https://api.example.com/*" "https://chat.example.com/*" response-origin); redirects=allow report-to=ca-report"}
+```
+
+It supports a `report-to` directive that works the same way as CSP's `report-to`, sending asynchronous violation reports when client-side code attempts to connect to an endpoint that is not allowed by the policy. Also as with CSP, there is a non-enforcing mode that allows you to monitor violations without blocking connections by naming the header `Connection-Allowlist-Report-Only`.
+
 ## Receiving reports – routes and controllers
 The package provides a route macro that you can use to define all the routes you need to receive reports. By default, it is configured to receive CSP level 3 and NEL reports (and any other `report-to`-compatible mechanism) at `/violations/reports`, and CSP level 2 reports at `/violations/csp`. You can change these by setting the prefix in your `.env` file, and configuring the suffixes in the endpoints defined in config – read the config file for more details. The short version is to add this line to your `web.php` route file:
 

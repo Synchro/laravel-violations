@@ -16,7 +16,8 @@
         "Reporting Endpoints",
         "Reporting API",
         "Permissions Policy",
-        "csp-hash"
+        "csp-hash",
+        "Connection Allowlists"
     ],
     "homepage": "https://github.com/synchro/laravel-violations",
     "license": "MIT",

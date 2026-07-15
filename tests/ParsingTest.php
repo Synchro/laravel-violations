@@ -2,6 +2,7 @@
 
 use Synchro\Violation\Enums\NELPhase;
 use Synchro\Violation\Enums\NetworkReportingReportType;
+use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
 use Synchro\Violation\Reports\CSP2Report;
 use Synchro\Violation\Reports\ReportFactory;
 
@@ -229,4 +230,56 @@ it('can reconstruct an NEL report', function () {
     // but we do expect the reconstructed one to be a subset of the original report
     expect($reconstructed)
         ->toBeASubsetOf(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+});
+
+it('parses a connection-allowlist report', function () {
+    // Example derived from https://wicg.github.io/connection-allowlists/#reporting
+    $report = json_decode(
+        '{
+    "age": 11431,
+    "body": {
+        "url": "https://example.com/",
+        "connection": "https://evil.example.com/exfiltrate",
+        "allowlist": "https://cdn.example https://*.example.:tld https://api.example:*",
+        "disposition": "enforce"
+    },
+    "type": "connection-allowlist",
+    "url": "https://example.com/",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+}',
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    );
+    $data = ReportFactory::from($report);
+    expect($data->type)
+        ->toBe(NetworkReportingReportType::CA)
+        ->and($data->age)->toBe(11431)
+        ->and($data->url)->toBe('https://example.com/')
+        ->and($data->userAgent)->toBe('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36')
+        ->and($data->body->url)->toBe('https://example.com/')
+        ->and($data->body->connection)->toBe('https://evil.example.com/exfiltrate')
+        ->and($data->body->allowlist)->toBe('https://cdn.example https://*.example.:tld https://api.example:*')
+        ->and($data->body->disposition)->toBe(SecurityPolicyViolationEventDisposition::Enforce);
+});
+
+it('can reconstruct a connection-allowlist report', function () {
+    $report = '{
+    "age": 11431,
+    "attempts": 1,
+    "body": {
+        "url": "https://example.com/",
+        "connection": "https://evil.example.com/exfiltrate",
+        "allowlist": "https://cdn.example https://*.example.:tld https://api.example:*",
+        "disposition": "report"
+    },
+    "type": "connection-allowlist",
+    "url": "https://example.com/",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+}';
+    $data = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    $reconstructed = $data->toArray();
+    expect($reconstructed)
+        ->toBeASubsetOf(json_decode($report, true, 512, JSON_THROW_ON_ERROR))
+        ->and($reconstructed['body']['disposition'])->toBe('report');
 });
