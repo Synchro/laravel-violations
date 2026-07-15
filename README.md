@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/synchro/laravel-violations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/synchro/laravel-violations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/synchro/laravel-violations.svg?style=flat-square)](https://packagist.org/packages/synchro/laravel-violations)
 
-This package provides a way to configure client-side reporting endpoint headers and handle the reports that they generate in Laravel.
+This package provides a way to configure client-side reporting endpoint headers and handle the reports that they generate in Laravel 13.
 
 Client-side errors can be reported by the `Content-Security-Policy` (CSP), Network Error Logging (`NEL`), `Permissions-Policy`, and several other mechanisms.
 
