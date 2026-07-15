@@ -1,7 +1,7 @@
 {
     "name": "synchro/laravel-violations",
     "type": "library",
-    "description": "Client-side report handling for CSP and NEL for Laravel",
+    "description": "Client-side reporting handling for Laravel",
     "keywords": [
         "Marcus Bointon",
         "laravel",
@@ -17,7 +17,8 @@
         "Reporting API",
         "Permissions Policy",
         "csp-hash",
-        "Connection Allowlists"
+        "Connection Allowlists",
+        "Deprecation"
     ],
     "homepage": "https://github.com/synchro/laravel-violations",
     "license": "MIT",
@@ -37,18 +38,18 @@
         "spatie/laravel-data": "^4.7.2"
     },
     "require-dev": {
-        "larastan/larastan": "^3.8.0",
-        "laravel/pint": "^v1.23.0",
-        "nunomaduro/collision": "^8.8.3",
-        "orchestra/testbench": "^11.0",
-        "pestphp/pest": "^v4.1.4",
-        "pestphp/pest-plugin-arch": "^v4.0.0",
-        "pestphp/pest-plugin-laravel": "^v4.0.0",
-        "pestphp/pest-plugin-type-coverage": "^v4.0.3",
+        "larastan/larastan": "^3.10.0",
+        "laravel/pint": "^1.29.3",
+        "nunomaduro/collision": "^8.9.4",
+        "orchestra/testbench": "^11.1.0",
+        "pestphp/pest": "^4.7.5",
+        "pestphp/pest-plugin-arch": "^v4.0.2",
+        "pestphp/pest-plugin-laravel": "^4.1.0",
+        "pestphp/pest-plugin-type-coverage": "^v4.0.4",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan-deprecation-rules": "^2.0.3",
-        "phpstan/phpstan-phpunit": "^2.0.8",
-        "spatie/laravel-csp": "^3.21.0"
+        "phpstan/phpstan-deprecation-rules": "^2.0.4",
+        "phpstan/phpstan-phpunit": "^2.0.18",
+        "spatie/laravel-csp": "^3.26.0"
     },
     "suggest": {
         "spatie/laravel-csp": "For CSP report handling integration"
