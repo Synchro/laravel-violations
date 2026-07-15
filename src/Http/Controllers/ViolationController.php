@@ -135,19 +135,24 @@ class ViolationController extends Controller
         // If the request includes an Access-Control-Request-Headers header,
         // extract the allowed headers and set the Access-Control-Allow-Headers header
         if ($request->hasHeader('Access-Control-Request-Headers')) {
-            if (! self::validateAccessControlRequestHeaders($request->header('Access-Control-Request-Headers'))) {
+            $requestHeaders = $request->header('Access-Control-Request-Headers');
+            if (! self::validateAccessControlRequestHeaders($requestHeaders)) {
                 return response('Invalid headers requested', 400);
             }
             // If we get here, all the requested headers are in the allowlist, so just copy the whole thing back to the response
-            $headers['Access-Control-Allow-Headers'] = $request->header('Access-Control-Request-Headers');
+            $headers['Access-Control-Allow-Headers'] = $requestHeaders;
         }
 
         // Return the response with the appropriate headers and a 204 No Content status code
         return response('', 204, $headers);
     }
 
-    private static function validateAccessControlRequestHeaders(string $headerValue): bool
+    private static function validateAccessControlRequestHeaders(?string $headerValue): bool
     {
+        if ($headerValue === null) {
+            return false;
+        }
+
         // Split the header value into individual headers
         $requestedHeaders = explode(',', $headerValue);
 
