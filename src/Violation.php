@@ -16,7 +16,10 @@ class Violation
      */
     public static function cspReportUri(): string
     {
-        return collect(config('violations.endpoints'))
+        /** @var array<int, array<string, mixed>> $endpoints */
+        $endpoints = config('violations.endpoints');
+
+        return collect($endpoints)
             ->where('report_source', ReportSource::REPORT_URI)
             ->map(fn (array $endpoint) => self::resolveEndpointUrl($endpoint))
             ->implode(' ');
@@ -27,7 +30,10 @@ class Violation
      */
     public static function cspReportTo(): string
     {
-        return collect(config('violations.endpoints'))
+        /** @var array<int, array<string, mixed>> $endpoints */
+        $endpoints = config('violations.endpoints');
+
+        return collect($endpoints)
             ->where('report_source', ReportSource::REPORT_TO)
             ->pluck('name')
             ->implode(' ');
@@ -39,7 +45,10 @@ class Violation
      */
     public static function reportingEndpointsHeaderValue(): string
     {
-        return collect(config('violations.endpoints'))
+        /** @var array<int, array<string, mixed>> $endpoints */
+        $endpoints = config('violations.endpoints');
+
+        return collect($endpoints)
             // Extract just the name and url from the endpoint list, format them as name=url
             ->map(function (array $endpoint) {
                 $url = self::resolveEndpointUrl($endpoint);
@@ -55,7 +64,10 @@ class Violation
      */
     public static function reportToHeaderValue(): string
     {
-        return collect(config('violations.endpoints'))
+        /** @var array<int, array<string, mixed>> $endpoints */
+        $endpoints = config('violations.endpoints');
+
+        return collect($endpoints)
             ->where('report_source', ReportSource::REPORT_TO)
             ->map(function (array $endpoint) {
                 $url = self::resolveEndpointUrl($endpoint);
@@ -76,6 +88,8 @@ class Violation
      * - 'route_suffix': Combined with route_prefix to build route name (preferred for dynamic prefix support)
      * - 'route': Direct route name (for backward compatibility)
      * - 'url': Callable or string URL (for backward compatibility)
+     *
+     * @param  array<string, mixed>  $endpoint
      */
     private static function resolveEndpointUrl(array $endpoint): string
     {

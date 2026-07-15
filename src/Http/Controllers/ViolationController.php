@@ -163,6 +163,8 @@ class ViolationController extends Controller
     /**
      * Process a single report from the report-to endpoint.
      * Handles storage, forwarding, and event dispatch for individual reports.
+     *
+     * @param  array<string, mixed>  $reportData
      */
     private function processReport(array $reportData, ?string $userAgent, ?string $ip): void
     {
@@ -198,6 +200,7 @@ class ViolationController extends Controller
      */
     private function getForwardingUrlForReportSource(ReportSource $reportSource): ?string
     {
+        /** @var array<int, array<string, mixed>> $endpoints */
         $endpoints = config('violations.endpoints', []);
 
         foreach ($endpoints as $endpoint) {
@@ -212,6 +215,8 @@ class ViolationController extends Controller
     /**
      * Reports from CSP & NEL report-to endpoints can contain either a bare report object or an array of multiple report objects.
      * Check whether the array is multiple reports or just one.
+     *
+     * @param  array<int, mixed>  $reports
      */
     private static function isArrayOfReports(array $reports): bool
     {

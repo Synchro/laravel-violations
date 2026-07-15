@@ -27,6 +27,7 @@ class QueueViolations extends Command
             return self::FAILURE;
         }
 
+        /** @var array<int, array<string, mixed>> $endpoints */
         $endpoints = config('violations.endpoints', []);
         $forwardingEndpoints = collect($endpoints)->filter(fn (array $endpoint) => ! empty($endpoint['forward_to']))->toArray();
 
@@ -81,6 +82,7 @@ class QueueViolations extends Command
      */
     private function getForwardingUrlForReportSource(ReportSource $reportSource): ?string
     {
+        /** @var array<int, array<string, mixed>> $endpoints */
         $endpoints = config('violations.endpoints', []);
 
         foreach ($endpoints as $endpoint) {

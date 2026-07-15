@@ -6,6 +6,7 @@ namespace Synchro\Violation\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Synchro\Violation\Enums\ReportSource;
@@ -14,7 +15,7 @@ use Synchro\Violation\Enums\ReportSource;
  * Declare properties.
  *
  * @property int $id
- * @property array $report
+ * @property array<string, mixed> $report
  * @property ReportSource $report_source
  * @property string $user_agent
  * @property string $ip
@@ -25,6 +26,7 @@ use Synchro\Violation\Enums\ReportSource;
  */
 class Violation extends Model
 {
+    /** @use HasFactory<Factory> */
     use HasFactory;
 
     /**
@@ -54,6 +56,9 @@ class Violation extends Model
         return config('violations.table');
     }
 
+    /**
+     * @param  Builder<self>  $query
+     */
     #[Scope]
     protected function unforwarded(Builder $query): void
     {
