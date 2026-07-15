@@ -74,6 +74,9 @@ Content-Security-Policy: default-src 'self'; report-to reports; report-uri https
 NEL: {"report-to": "nel"}
 ```
 
+> [!INFO]
+> Some report types (such as deprecations and crashes) do not provide a way to set a target reporting endpoint, so be sure to create an endpoint named `default`, which will receive those report types.
+
 ## Creating reporting headers
 This package provides a middleware that will add both the `Reporting-Endpoints` and deprecated `Report-To` headers to your responses, either of which is required for the `report-to` directive to work in either CSP3 or NEL. You can add this as global middleware (so it will be added to all responses) in `bootstrap/app.php`:
 
@@ -99,7 +102,9 @@ return response($content)
 ```
 
 #### Enabling CSP hash reports
-If you want to enable [CSP hash reports](https://w3c.github.io/webappsec-csp/#reporting), add the `'report-sha256'` keyword (or `'report-sha384'` or `'report-sha512'` depending on which hash type you want to receive, and note that the single quotes around the values are required) to the `script-src` directive in your CSP header. With that in place, you will start receiving reports in the `csp-hash` format for *every script that your page loads*, sent to the same endpoint as your CSP reports. Note that this *only* works when you're using the CSP3 `report-to` directive, as no report format is defined for CSP2-style `report-uri` endpoints. Note that these reports are purely for usage monitoring, and do not represent a violation or error status; they are useful to help you keep track of exactly what software you are using. [Report-uri.com announced support for these reports in September 2025](https://scotthelme.co.uk/capture-javascript-integrity-metadata-using-csp/).
+If you want to enable [CSP hash reports](https://w3c.github.io/webappsec-csp/#reporting), add the `'report-sha256'` keyword (or `'report-sha384'` or `'report-sha512'` depending on which hash type you want to receive, and note that the single quotes around the values are required) to the `script-src` directive in your CSP header. With that in place, you will start receiving reports in the `csp-hash` format for *every script that your page loads*, sent to the same endpoint as your CSP reports. Note that this *only* works when you're using the CSP3 `report-to` directive, as no report format is defined for CSP2-style `report-uri` endpoints. Due to the potential for privacy leaks, be sure to set `crossorigin="anonymous"` on any `<script>` tags that load scripts from other origins, or the reports you receive will not contain any useful information.
+
+Note that these reports are purely for usage monitoring, and do not represent a violation or error status; they are useful to help you keep track of exactly what software you are using. [Report-uri.com announced support for these reports in September 2025](https://scotthelme.co.uk/capture-javascript-integrity-metadata-using-csp/).
 
 > [!TIP]
 > These reports do not have anything to do with SRI hashes used to spot unexpected changes to external scripts; they are simply a way to monitor which scripts are being loaded on your pages, useful for validating [SBOMs](https://www.cisa.gov/sbom) or dependency/vulnerability/compliance tracking.
@@ -141,6 +146,9 @@ Just as for CSP, creating this header is left up to you, but note that the `repo
 
 > [!TIP]
 > Be aware that NEL isn't very useful for site owners because it sends reports to the domain hosting the resource that failed to load, so if your site loads resources from third-party CDNs, it will send reports to them, not to you. You can only get reports for resources served from your own domain, which you would find out about from your own regular server logs anyway. It might be useful if you're operating a CDN, but not so much otherwise.
+
+## Deprecation reporting
+[Deprecation reports](https://wicg.github.io/deprecation-reporting/) are sent by browsers when they encounter the use of features that are deprecated and will be removed in the future, for example the use of synchronous XMLHttpRequests. Unlike most of the other reporting mechanisms covered here, there is no HTTP header associated with deprecation reporting, because it's up to the browser, not the site it's visiting to determine whether a feature is deprecated or not. Consequently, there is nowhere to configure a reporting endpoint, so the browser will send reports to a reporting endpoint named `default`, which you should define in your `Reporting-Endpoints` header.
 
 ## Connection-Allowlist reporting
 The `Connection-Allowlist` header is a new header (currently only [implemented experimentally in Chrome](https://developer.chrome.com/blog/connection-allowlists-origin-trial)) that allows you to specify URL patterns that your web pages are allowed to connect to. It's similar to `connect-src` in CSP, but provides more control, and applies to all types of connections, including Fetch, WebRTC, Web Payments, WebTransport, DNS prefetch, and others.

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Carbon;
 use Synchro\Violation\Enums\NELPhase;
 use Synchro\Violation\Enums\NetworkReportingReportType;
 use Synchro\Violation\Enums\SecurityPolicyViolationEventDisposition;
@@ -282,4 +283,91 @@ it('can reconstruct a connection-allowlist report', function () {
     expect($reconstructed)
         ->toBeASubsetOf(json_decode($report, true, 512, JSON_THROW_ON_ERROR))
         ->and($reconstructed['body']['disposition'])->toBe('report');
+});
+
+it('parses a deprecation report', function () {
+    // Example from https://wicg.github.io/deprecation-reporting/#deprecation-report
+    $report = json_decode(
+        '{
+    "age": 11431,
+    "body": {
+        "sourceFile": "https://example.com/script.js",
+        "lineNumber": 42,
+        "columnNumber": 7,
+        "id": "deprecated-api",
+        "message": "This API is deprecated and will be removed in a future release.",
+        "anticipatedRemoval": "2025-12-01"
+    },
+    "type": "deprecation",
+    "url": "https://example.com/",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+}',
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    );
+    $data = ReportFactory::from($report);
+    expect($data->type)
+        ->toBe(NetworkReportingReportType::DEP)
+        ->and($data->age)->toBe(11431)
+        ->and($data->url)->toBe('https://example.com/')
+        ->and($data->userAgent)->toBe('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36')
+        ->and($data->body->sourceFile)->toBe('https://example.com/script.js')
+        ->and($data->body->lineNumber)->toBe(42)
+        ->and($data->body->columnNumber)->toBe(7)
+        ->and($data->body->id)->toBe('deprecated-api')
+        ->and($data->body->message)->toBe('This API is deprecated and will be removed in a future release.')
+        ->and($data->body->anticipatedRemoval)->toBeInstanceOf(Carbon::class)
+        ->and($data->body->anticipatedRemoval->format('Y-m-d'))->toBe('2025-12-01');
+});
+
+it('can reconstruct a deprecation report', function () {
+    $report = '{
+    "age": 11431,
+    "attempts": 1,
+    "body": {
+        "sourceFile": "https://example.com/script.js",
+        "lineNumber": 42,
+        "columnNumber": 7,
+        "id": "deprecated-api",
+        "message": "This API is deprecated and will be removed in a future release.",
+        "anticipatedRemoval": "2025-12-01"
+    },
+    "type": "deprecation",
+    "url": "https://example.com/",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+}';
+    $data = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    $reconstructed = $data->toArray();
+    expect($reconstructed)
+        ->toBeASubsetOf(json_decode($report, true, 512, JSON_THROW_ON_ERROR))
+        ->and($reconstructed['body']['id'])->toBe('deprecated-api')
+        ->and($reconstructed['body']['anticipatedRemoval'])->toBe('2025-12-01');
+});
+
+it('can reconstruct a deprecation report with null values', function () {
+    $report = '{
+    "age": 11431,
+    "attempts": 1,
+    "body": {
+        "sourceFile": null,
+        "lineNumber": null,
+        "columnNumber": null,
+        "id": "deprecated-api",
+        "message": "This API is deprecated and will be removed in a future release.",
+        "anticipatedRemoval": null
+    },
+    "type": "deprecation",
+    "url": "https://example.com/",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+}';
+    $data = ReportFactory::from(json_decode($report, true, 512, JSON_THROW_ON_ERROR));
+    $reconstructed = $data->toArray();
+    expect($reconstructed)
+        ->toBeASubsetOf(json_decode($report, true, 512, JSON_THROW_ON_ERROR))
+        ->and($reconstructed['body']['id'])->toBe('deprecated-api')
+        ->and($reconstructed['body']['sourceFile'])->toBeNull()
+        ->and($reconstructed['body']['lineNumber'])->toBeNull()
+        ->and($reconstructed['body']['columnNumber'])->toBeNull()
+        ->and($reconstructed['body']['anticipatedRemoval'])->toBeNull();
 });

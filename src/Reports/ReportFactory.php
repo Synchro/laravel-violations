@@ -24,6 +24,7 @@ class ReportFactory
             NetworkReportingReportType::CSPH->value => CSP3HashReport::from($data),
             NetworkReportingReportType::PPV->value => PermissionsPolicyReport::from($data),
             NetworkReportingReportType::CA->value => ConnectionAllowlistReport::from($data),
+            NetworkReportingReportType::DEP->value => DeprecationReport::from($data),
             default => throw new InvalidArgumentException("Unsupported report type: $type"),
         };
     }

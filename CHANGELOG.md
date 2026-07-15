@@ -1,5 +1,9 @@
 # Changelog
 
+# Laravel Violations 1.1.0 - 2026-07-15
+
+* Added support for `deprecation` (requires a `default` reporting endpoint) and `connection-allowlist` reports.
+
 # Laravel Violations 1.0.0 - 2025-11-24
 
 * Added support for `csp-hash` and `permissions-policy-violation` reports, though csp-hash reports are only supported when using CSP3 `report-to` endpoints.

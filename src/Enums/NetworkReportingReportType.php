@@ -14,4 +14,5 @@ enum NetworkReportingReportType: string
     case CSPH = 'csp-hash';
     case PPV = 'permissions-policy-violation';
     case CA = 'connection-allowlist';
+    case DEP = 'deprecation';
 }
