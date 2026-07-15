@@ -5,11 +5,12 @@ First off, thanks for taking the time to contribute! ❤️
 
 All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
 
-> And if you like the project, but just don't have time to contribute, that's fine. There are other easy ways to support the project and show your appreciation, which we would also be very happy about:
+> If you like the project, but just don't have time to contribute, that's fine. There are other easy ways to support the project and show your appreciation, which we would also be very happy about:
 > - Star the project
 > - Tweet about it
 > - Refer this project in your project's readme
 > - Mention the project at local meetups and tell your friends/colleagues
+> - [Sponsor the project's developers](https://github.com/sponsors/Synchro)
 
 <!-- omit in toc -->
 ## Table of Contents
@@ -24,8 +25,6 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 - [Commit Messages](#commit-messages)
 - [Join The Project Team](#join-the-project-team)
 
-
-
 ## I Have a Question
 
 > If you want to ask a question, we assume that you have read the available [Documentation](https://github.com/synchro/laravel-violations/README.md).
@@ -36,24 +35,9 @@ If you then still feel the need to ask a question and need clarification, we rec
 
 - Open an [Issue](https://github.com/synchro/laravel-violations/issues/new).
 - Provide as much context as you can about what you're running into.
-- Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
+- Provide project and platform versions (PHP, etc), depending on what seems relevant.
 
 We will then take care of the issue as soon as possible.
-
-<!--
-You might want to create a separate issue tag for questions and include it in this description. People should then tag their issues accordingly.
-
-Depending on how large the project is, you may want to outsource the questioning, e.g. to Stack Overflow or Gitter. You may add additional contact and information possibilities:
-- IRC
-- Slack
-- Gitter
-- Stack Overflow tag
-- Blog
-- FAQ
-- Roadmap
-- E-Mail List
-- Forum
--->
 
 ## I Want To Contribute
 
@@ -98,6 +82,8 @@ Once it's filed:
 
 This section guides you through submitting an enhancement suggestion for Laravel Violations, **including completely new features and minor improvements to existing functionality**. Following these guidelines will help maintainers and the community to understand your suggestion and find related suggestions.
 
+The most interesting enhancements would be support for new reporting formats; new ones are appearing quite frequently.
+
 <!-- omit in toc -->
 #### Before Submitting an Enhancement
 
@@ -116,13 +102,15 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/synchr
 - **Describe the current behavior** and **explain which behavior you expected to see instead** and why. At this point you can also tell which alternatives do not work for you.
 - **Explain why this enhancement would be useful** to most Laravel Violations users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
 
-### Your First Code Contribution
+### Code Contributions
 Things that we want to see in any contributions:
 
 * Conform to the coding standard, which uses Laravel Pint with default settings – run it with `composer format`.
 * Code should have 100% type coverage, which shouldn't be too hard given that the base language level is PHP 8.4. Use `composer types` to check type coverage.
+* Code must pass phpstan level 10 static analysis; use `composer analyse` to check.
 * Any technical or functional changes should have matching tests. 100% coverage is nice to have, but not strictly necessary. Run the tests with coverage using `composer test-coverage`.
 * [Sign your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) with your name and email address using either SSH or GPG keys, and ensure that the email address matches the one in your GitHub account. This is important for maintaining traceability of all contributions.
+* No AI slop.
 
 ### Improving The Documentation
 PRs for expanding the documentation are very welcome. Where docs relate to standards, include links to the specific parts of the specs.
