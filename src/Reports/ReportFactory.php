@@ -10,7 +10,7 @@ use Synchro\Violation\Enums\NetworkReportingReportType;
 class ReportFactory
 {
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<mixed, mixed>  $data
      */
     public static function from(array $data): Report
     {
