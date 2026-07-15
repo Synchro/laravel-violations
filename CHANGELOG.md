@@ -1,8 +1,13 @@
 # Changelog
 
-# Laravel Violations 1.1.0 - 2026-07-15
+# Laravel Violations 2.1.0 - 2026-07-15
 
 * Added support for `deprecation` (requires a `default` reporting endpoint) and `connection-allowlist` reports.
+* Now passes phpstan level 10.
+
+# Laravel Violations 2.0.0 - 2026-03-26
+
+Major version bump for BC break with Laravel 13.
 
 # Laravel Violations 1.0.0 - 2025-11-24
 
